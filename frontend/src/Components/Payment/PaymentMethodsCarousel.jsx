@@ -2,8 +2,11 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
+import bkashLogo from "../../assets/logos/1656227518bkash-logo-png.png";
+import nagadLogo from "../../assets/logos/Nagad_Logo_horizontally_og.png";
+import rocketLogo from "../../assets/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png";
 
-// ✅ Payment methods data
+// ✅ Example payment method data
 const paymentMethods = [
   {
     id: 1,
@@ -27,7 +30,7 @@ const paymentMethods = [
     id: 4,
     name: "Google Pay",
     description: "Pay easily via Google Pay on supported devices.",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/960px-Google_Pay_Logo.svg.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/960px-Google_Pay_Logo.svg.png?20221017164555",
   },
   {
     id: 5,
@@ -39,19 +42,22 @@ const paymentMethods = [
     id: 6,
     name: "bKash",
     description: "Pay easily using your bKash mobile wallet.",
-    logo: "/logos/1656227518bkash-logo-png.png",
+    logo: "/frontend/src/Components/Payment/logos/1656227518bkash-logo-png.png",
+
   },
   {
     id: 7,
     name: "Nagad",
     description: "Fast and secure payments via Nagad account.",
-    logo: "/logos/Nagad_Logo_horizontally_og.png",
+    logo: "/frontend/src/Components/Payment/logos/Nagad_Logo_horizontally_og.png",
+
   },
   {
     id: 8,
     name: "Rocket",
     description: "Pay with Rocket (Dutch-Bangla Mobile Banking).",
-    logo: "/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
+    logo: "/frontend/src/Components/Payment/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
+
   },
 ];
 
@@ -64,14 +70,21 @@ export default function PaymentMethodsCarousel() {
     slidesToScroll: 1,
     arrows: true,
     autoplay: true,
-    autoplaySpeed: 2000,
+    autoplaySpeed: 200,
     responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 2 } },
-      { breakpoint: 640, settings: { slidesToShow: 1 } },
+      {
+        breakpoint: 1024,
+        settings: { slidesToShow: 2 },
+      },
+      {
+        breakpoint: 640,
+        settings: { slidesToShow: 1 },
+      },
     ],
   };
 
   return (
+    <div>
     <div className="max-w-6xl mx-auto px-6 py-12 bg-gradient-to-b from-gray-50 to-white">
       <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-10">
         💳 Choose Your Payment Method
@@ -99,6 +112,8 @@ export default function PaymentMethodsCarousel() {
           </div>
         ))}
       </Slider>
+    </div>
+    <br /><br /><br /><br /><br />
     </div>
   );
 }
