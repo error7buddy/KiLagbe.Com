@@ -2,9 +2,7 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import bkashLogo from "../../assets/logos/1656227518bkash-logo-png.png";
-import nagadLogo from "../../assets/logos/Nagad_Logo_horizontally_og.png";
-import rocketLogo from "../../assets/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png";
+
 
 // ✅ Example payment method data
 const paymentMethods = [
