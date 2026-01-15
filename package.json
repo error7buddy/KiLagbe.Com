@@ -1,0 +1,16 @@
+{
+  "name": "my_app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "backend": "nodemon backend/index.js",
+    "frontend": "npm --prefix frontend run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0",
+    "tailwindcss": "^4.1.18"
+  }
+}
