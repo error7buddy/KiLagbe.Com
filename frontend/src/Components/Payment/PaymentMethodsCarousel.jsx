@@ -40,21 +40,21 @@ const paymentMethods = [
     id: 6,
     name: "bKash",
     description: "Pay easily using your bKash mobile wallet.",
-    logo: "/frontend/src/Components/Payment/logos/1656227518bkash-logo-png.png",
+    logo: "/logos/1656227518bkash-logo-png.png",
 
-  },
+  }, 
   {
     id: 7,
     name: "Nagad",
     description: "Fast and secure payments via Nagad account.",
-    logo: "/frontend/src/Components/Payment/logos/Nagad_Logo_horizontally_og.png",
+    logo: "/logos/Nagad_Logo_horizontally_og.png",
 
   },
   {
     id: 8,
     name: "Rocket",
     description: "Pay with Rocket (Dutch-Bangla Mobile Banking).",
-    logo: "/frontend/src/Components/Payment/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
+   logo: "/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
 
   },
 ];
