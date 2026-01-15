@@ -7,7 +7,7 @@ const About = () => {
         {/* Left Side - Image */}
         <div className="relative">
           <img
-            src="src/Components/About/image.png"
+            src=""
             alt="About Us"
             className="rounded-2xl shadow-lg object-cover w-full h-[400px]"
           />
