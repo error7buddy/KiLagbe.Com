@@ -27,7 +27,7 @@ const paymentMethods = [
     id: 4,
     name: "Google Pay",
     description: "Pay easily via Google Pay on supported devices.",
-    logo: "src/Components/Payment/logos/Google_Pay_Logo.svg.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/960px-Google_Pay_Logo.svg.png?20221017164555",
   },
   {
     id: 5,
