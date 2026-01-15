@@ -3,7 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
-// ✅ Example payment method data
+// ✅ Payment methods data
 const paymentMethods = [
   {
     id: 1,
@@ -27,7 +27,7 @@ const paymentMethods = [
     id: 4,
     name: "Google Pay",
     description: "Pay easily via Google Pay on supported devices.",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/960px-Google_Pay_Logo.svg.png?20221017164555",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/960px-Google_Pay_Logo.svg.png",
   },
   {
     id: 5,
@@ -39,22 +39,19 @@ const paymentMethods = [
     id: 6,
     name: "bKash",
     description: "Pay easily using your bKash mobile wallet.",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/BKash_logo.svg/2560px-BKash_logo.svg.png",
-
+    logo: "/logos/1656227518bkash-logo-png.png",
   },
   {
     id: 7,
     name: "Nagad",
     description: "Fast and secure payments via Nagad account.",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Nagad-png.png?20250905062005",
-
+    logo: "/logos/Nagad_Logo_horizontally_og.png",
   },
   {
     id: 8,
     name: "Rocket",
     description: "Pay with Rocket (Dutch-Bangla Mobile Banking).",
-    logo: "https://images.sftcdn.net/images/t_app-icon-s/p/00cb67a4-fd0d-4ad4-84d6-0a73306ad95d/3263349106/rocket-logo",
-
+    logo: "/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
   },
 ];
 
@@ -67,21 +64,14 @@ export default function PaymentMethodsCarousel() {
     slidesToScroll: 1,
     arrows: true,
     autoplay: true,
-    autoplaySpeed: 200,
+    autoplaySpeed: 2000,
     responsive: [
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: 2 },
-      },
-      {
-        breakpoint: 640,
-        settings: { slidesToShow: 1 },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
   };
 
   return (
-    <div>
     <div className="max-w-6xl mx-auto px-6 py-12 bg-gradient-to-b from-gray-50 to-white">
       <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-10">
         💳 Choose Your Payment Method
@@ -109,8 +99,6 @@ export default function PaymentMethodsCarousel() {
           </div>
         ))}
       </Slider>
-    </div>
-    <br /><br /><br /><br /><br />
     </div>
   );
 }
