@@ -3,13 +3,16 @@ import React, { useEffect, useState } from "react";
 const AdminShifting = () => {
   const [orders, setOrders] = useState([]);
 
+  // ✅ Backend API
+  const API = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchOrders();
   }, []);
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/shifting-orders");
+      const res = await fetch(`${API}/api/shifting-orders`);
       const data = await res.json();
       setOrders(data);
     } catch (error) {

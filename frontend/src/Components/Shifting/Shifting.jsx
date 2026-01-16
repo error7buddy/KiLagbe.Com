@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentMethodsCarousel from "../Payment/PaymentMethodsCarousel";
+import houseImg from "../Shifting/images/image.png"; // ✅ Import local image
 
 export default function Shifting() {
   const navigate = useNavigate();
@@ -19,8 +20,7 @@ export default function Shifting() {
       title: "House Shifting",
       description:
         "Full house moving with packing, loading, and transport services.",
-      image:
-        "src/Components/Shifting/images/image.png",
+      image: houseImg,
     },
     {
       id: 3,
@@ -65,6 +65,7 @@ export default function Shifting() {
           </div>
         ))}
       </div>
+
       <br /><br /><br /><br />
       <br />
       <PaymentMethodsCarousel />

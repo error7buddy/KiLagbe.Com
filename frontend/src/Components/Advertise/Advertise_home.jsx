@@ -3,12 +3,15 @@ import axios from "axios";
 import { auth } from "../../Firebase/config";
 import { useNavigate } from "react-router-dom";
 
+// ✅ Use environment variable for API
+const API = import.meta.env.VITE_API_URL;
+
 const AdCard = ({ ad }) => {
   return (
     <div className="max-w-sm bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 cursor-pointer">
       {ad.images?.length > 0 && (
         <img
-          src={ad.images[0]} // Assuming your backend returns URL for images
+          src={`${API}/uploads/${ad.images[0]}`} // updated to use API variable
           alt={ad.title}
           className="w-full h-48 object-cover"
         />
@@ -18,6 +21,9 @@ const AdCard = ({ ad }) => {
         <p className="text-gray-600 text-sm mb-2">{ad.description}</p>
         <p className="text-gray-800 font-semibold">{ad.bhk} BHK - {ad.area}</p>
         <p className="text-gray-600 text-sm">{ad.district}</p>
+        {ad.phone && (
+          <p className="text-gray-700 text-sm mt-1">📞 {ad.phone}</p>
+        )}
       </div>
     </div>
   );
@@ -41,7 +47,7 @@ const AdFormPage = () => {
   // Fetch ads from backend
   const fetchAds = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/ads");
+      const res = await axios.get(`${API}/api/ads`);
       setAds(res.data.ads || []);
     } catch (err) {
       console.error(err);
@@ -81,7 +87,7 @@ const AdFormPage = () => {
         data.append("images", formData.images[i]);
       }
 
-      const res = await axios.post("http://localhost:5000/api/ads", data);
+      const res = await axios.post(`${API}/api/ads`, data);
 
       if (res.data.success) {
         alert("✅ Ad posted successfully!");

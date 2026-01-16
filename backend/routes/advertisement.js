@@ -4,24 +4,26 @@ import multer from "multer";
 
 const router = express.Router();
 
-// multer config
+// ✅ Multer config for file uploads
 const storage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
 
-// POST ad
+// ✅ POST new ad
 router.post("/", upload.array("images", 5), async (req, res) => {
   try {
     const { userId, title, description, bhk, houseNo, area, district, phone } = req.body;
 
-    if (!userId) return res.status(400).json({ success: false, message: "User ID is required" });
+    if (!userId || !title || !description) {
+      return res.status(400).json({ success: false, message: "User ID, title, and description are required" });
+    }
 
-    // Count **active ads** for this user
+    // Count active ads for this user
     const userAdsCount = await Advertisement.countDocuments({ userId });
-
     const FREE_AD_LIMIT = 2;
+
     if (userAdsCount >= FREE_AD_LIMIT) {
       return res.status(403).json({
         success: false,
@@ -43,7 +45,7 @@ router.post("/", upload.array("images", 5), async (req, res) => {
     await ad.save();
     res.json({ success: true, ad });
   } catch (err) {
-    console.error(err);
+    console.error("Ad posting error:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -54,7 +56,8 @@ router.get("/", async (req, res) => {
     const ads = await Advertisement.find().sort({ createdAt: -1 });
     res.json(ads);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Get all ads error:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
@@ -64,17 +67,19 @@ router.get("/user/:userId", async (req, res) => {
     const ads = await Advertisement.find({ userId: req.params.userId }).sort({ createdAt: -1 });
     res.json(ads);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Get user ads error:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// ✅ DELETE ad
+// ✅ DELETE an ad
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await Advertisement.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ success: false, message: "Ad not found" });
     res.json({ success: true });
   } catch (err) {
+    console.error("Delete ad error:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 });

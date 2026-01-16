@@ -7,6 +7,9 @@ const AdminPage = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
+  // ✅ Backend API from env
+  const API = import.meta.env.VITE_API_URL;
+
   // ✅ Check admin login
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin");
@@ -16,7 +19,7 @@ const AdminPage = () => {
   // ✅ Fetch all ads
   const fetchAds = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/ads");
+      const res = await fetch(`${API}/api/ads`);
       const data = await res.json();
       setAds(data);
     } catch (error) {
@@ -27,7 +30,7 @@ const AdminPage = () => {
   // ✅ Fetch all shifting orders
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/shifting-orders");
+      const res = await fetch(`${API}/api/shifting-orders`);
       const data = await res.json();
       setOrders(data);
     } catch (error) {
@@ -44,7 +47,7 @@ const AdminPage = () => {
   const handleDeleteAd = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this ad permanently?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/ads/${_id}`, { method: "DELETE" });
+      const res = await fetch(`${API}/api/ads/${_id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         setAds(prev => prev.filter(ad => ad._id !== _id));
@@ -62,7 +65,7 @@ const AdminPage = () => {
   const handleDeleteOrder = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this shifting order permanently?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/shifting-orders/${_id}`, { method: "DELETE" });
+      const res = await fetch(`${API}/api/shifting-orders/${_id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         setOrders(prev => prev.filter(o => o._id !== _id));
@@ -79,7 +82,7 @@ const AdminPage = () => {
   // ✅ Mark shifting order as complete
   const handleCompleteOrder = async (_id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/shifting-orders/${_id}/complete`, { method: "PUT" });
+      const res = await fetch(`${API}/api/shifting-orders/${_id}/complete`, { method: "PUT" });
       const data = await res.json();
       if (data.success) {
         setOrders(prev =>
@@ -157,7 +160,7 @@ const AdminPage = () => {
                     <p className="text-sm text-gray-500 mb-2">📞 {ad.address?.phone || "N/A"}</p>
 
                     {ad.images?.length > 0 && ad.images.map((img, i) => (
-                      <img key={i} src={`http://localhost:5000/uploads/${img}`} alt={ad.title || "Ad Image"} className="w-full h-40 object-cover rounded mb-2" />
+                      <img key={i} src={`${API}/uploads/${img}`} alt={ad.title || "Ad Image"} className="w-full h-40 object-cover rounded mb-2" />
                     ))}
 
                     <button

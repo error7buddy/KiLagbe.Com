@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 
+const API = import.meta.env.VITE_API_URL; // ✅ Use env variable
+
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [ads, setAds] = useState([]);
@@ -22,9 +24,7 @@ const Profile = () => {
   const fetchUserAds = async () => {
     if (!user) return;
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/ads/user/${user.uid}`
-      );
+      const res = await fetch(`${API}/api/ads/user/${user.uid}`); // ✅ changed URL
       const data = await res.json();
       setAds(data);
     } catch (err) {
@@ -40,9 +40,7 @@ const Profile = () => {
   const handleDeleteAd = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this ad?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/ads/${_id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`${API}/api/ads/${_id}`, { method: "DELETE" }); // ✅ changed URL
       const data = await res.json();
       if (data.success) {
         setAds((prev) => prev.filter((ad) => ad._id !== _id));
@@ -111,7 +109,7 @@ const Profile = () => {
 
                   {ad.images?.[0] && (
                     <img
-                      src={`http://localhost:5000/uploads/${ad.images[0]}`}
+                      src={`${API}/uploads/${ad.images[0]}`} // ✅ changed URL
                       alt="ad"
                       className="w-full h-40 object-cover rounded-lg mb-4"
                     />
@@ -120,13 +118,13 @@ const Profile = () => {
                   <div className="mt-auto flex gap-2">
                     <button
                       onClick={() => handleEditAd(ad._id)}
-                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition py-2 rounded"
+                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteAd(ad._id)}
-                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition py-2 rounded"
+                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
                     >
                       Delete
                     </button>

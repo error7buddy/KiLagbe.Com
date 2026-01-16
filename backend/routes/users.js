@@ -3,17 +3,23 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
+// ✅ POST create or fetch user
 router.post("/", async (req, res) => {
   try {
     const { userId, email } = req.body;
-    const existing = await User.findOne({ userId });
-    if (existing) return res.json(existing);
+    if (!userId) return res.status(400).json({ success: false, message: "User ID is required" });
 
-    const newUser = new User({ userId, email });
+    // Check if user already exists
+    const existing = await User.findOne({ firebaseUid: userId });
+    if (existing) return res.json({ success: true, user: existing });
+
+    // Create new user
+    const newUser = new User({ firebaseUid: userId, email });
     await newUser.save();
-    res.json(newUser);
+    res.json({ success: true, user: newUser });
   } catch (err) {
-    res.status(500).json({ message: "Error creating user", error: err });
+    console.error("Create user error:", err);
+    res.status(500).json({ success: false, message: "Error creating user", error: err.message });
   }
 });
 

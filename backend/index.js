@@ -5,6 +5,7 @@ import cors from "cors";
 
 import adRoutes from "./routes/advertisement.js";
 import shiftingRoutes from "./routes/shifting.js";
+import userRoutes from "./routes/users.js"; // Added user route
 
 dotenv.config();
 
@@ -22,10 +23,13 @@ if (!process.env.MONGO_URI) {
 }
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => {
-    console.error("❌ MongoDB error:", err.message);
+    console.error("❌ MongoDB connection error:", err.message);
     process.exit(1);
   });
 
@@ -37,6 +41,7 @@ app.get("/", (req, res) => {
 /* ---------- ROUTES ---------- */
 app.use("/api/ads", adRoutes);
 app.use("/api/shifting-orders", shiftingRoutes);
+app.use("/api/users", userRoutes); // Added user route
 
 /* ---------- SERVER ---------- */
 const PORT = process.env.PORT || 5000;
