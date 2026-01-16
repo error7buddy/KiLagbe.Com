@@ -3,33 +3,22 @@ import axios from "axios";
 import { auth } from "../../Firebase/config";
 import { useNavigate } from "react-router-dom";
 
-// ✅ Use environment variable for API
 const API = import.meta.env.VITE_API_URL;
 
 const AdCard = ({ ad }) => {
-  const hasImages = Array.isArray(ad.images) && ad.images.length > 0;
-
   return (
-    <div className="max-w-sm bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 cursor-pointer">
-      {/* ⚠️ Vercel can't serve /uploads, so show a safe placeholder */}
-      {hasImages ? (
-        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-          Image not available on Vercel (use Cloudinary/Firebase)
-        </div>
-      ) : (
-        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-          No image
-        </div>
-      )}
+    <div className="max-w-sm bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+        {ad.images?.length ? "Image URL needed (Cloudinary/Firebase)" : "No image"}
+      </div>
 
       <div className="p-4">
         <h3 className="text-lg font-bold mb-2">{ad.title}</h3>
         <p className="text-gray-600 text-sm mb-2">{ad.description}</p>
-
-        {/* ✅ Your backend stores area/district/phone inside address */}
-        <p className="text-gray-800 font-semibold">{ad.bhk} BHK - {ad.address?.area}</p>
+        <p className="text-gray-800 font-semibold">
+          {ad.bhk} BHK - {ad.address?.area}
+        </p>
         <p className="text-gray-600 text-sm">{ad.address?.district}</p>
-
         {ad.address?.phone && (
           <p className="text-gray-700 text-sm mt-1">📞 {ad.address.phone}</p>
         )}
@@ -47,14 +36,12 @@ const AdFormPage = () => {
     area: "",
     district: "",
     phone: "",
-    images: [],
   });
 
   const [ads, setAds] = useState([]);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Fetch ads from backend (backend returns ARRAY directly)
   const fetchAds = async () => {
     try {
       if (!API) return console.error("❌ VITE_API_URL missing");
@@ -70,14 +57,8 @@ const AdFormPage = () => {
     fetchAds();
   }, [API]);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "images") {
-      setFormData((prev) => ({ ...prev, images: files ? Array.from(files) : [] }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,28 +66,22 @@ const AdFormPage = () => {
     try {
       const user = auth.currentUser;
       if (!user) return alert("Please login first");
+      if (!API) return alert("VITE_API_URL missing");
 
-      if (!API) return alert("VITE_API_URL missing in frontend env");
+      const payload = {
+        userId: user.uid,
+        title: formData.title,
+        description: formData.description,
+        bhk: formData.bhk,
+        houseNo: formData.houseNo,
+        area: formData.area,
+        district: formData.district,
+        phone: formData.phone,
+        images: [], // later store Cloudinary/Firebase URLs here
+      };
 
-      const data = new FormData();
-      data.append("userId", user.uid);
-      data.append("title", formData.title);
-      data.append("description", formData.description);
-      data.append("bhk", formData.bhk);
-      data.append("houseNo", formData.houseNo);
-      data.append("area", formData.area);
-      data.append("district", formData.district);
-      data.append("phone", formData.phone);
-
-      // images
-      if (formData.images && formData.images.length > 0) {
-        for (let i = 0; i < formData.images.length; i++) {
-          data.append("images", formData.images[i]);
-        }
-      }
-
-      const res = await axios.post(`${API}/api/ads`, data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const res = await axios.post(`${API}/api/ads`, payload, {
+        headers: { "Content-Type": "application/json" },
       });
 
       if (res.data.success) {
@@ -119,26 +94,22 @@ const AdFormPage = () => {
           area: "",
           district: "",
           phone: "",
-          images: [],
         });
         fetchAds();
       } else {
         alert(res.data.message || "❌ Failed to post ad");
       }
     } catch (err) {
-      const status = err?.response?.status;
-
-      if (status === 403) {
+      if (err.response?.status === 403) {
         setShowLimitModal(true);
       } else {
-        alert(err?.response?.data?.message || "Error posting ad");
+        alert(err.response?.data?.message || "Error posting ad");
       }
     }
   };
 
   return (
     <div className="container mx-auto p-6">
-      {/* Ad Form */}
       <form
         onSubmit={handleSubmit}
         className="max-w-lg mx-auto p-6 bg-white shadow rounded mt-10 mb-10"
@@ -154,6 +125,7 @@ const AdFormPage = () => {
           required
           className="w-full p-2 mb-2 border rounded"
         />
+
         <textarea
           name="description"
           placeholder="Description"
@@ -162,6 +134,7 @@ const AdFormPage = () => {
           required
           className="w-full p-2 mb-2 border rounded"
         />
+
         <input
           type="text"
           name="bhk"
@@ -170,6 +143,7 @@ const AdFormPage = () => {
           onChange={handleChange}
           className="w-full p-2 mb-2 border rounded"
         />
+
         <input
           type="text"
           name="houseNo"
@@ -178,6 +152,7 @@ const AdFormPage = () => {
           onChange={handleChange}
           className="w-full p-2 mb-2 border rounded"
         />
+
         <input
           type="text"
           name="area"
@@ -186,6 +161,7 @@ const AdFormPage = () => {
           onChange={handleChange}
           className="w-full p-2 mb-2 border rounded"
         />
+
         <input
           type="text"
           name="district"
@@ -194,6 +170,7 @@ const AdFormPage = () => {
           onChange={handleChange}
           className="w-full p-2 mb-2 border rounded"
         />
+
         <input
           type="text"
           name="phone"
@@ -201,21 +178,6 @@ const AdFormPage = () => {
           value={formData.phone}
           onChange={handleChange}
           className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="file"
-          name="images"
-          onChange={handleChange}
-          multiple
-          className="w-full mb-2 border border-gray-300 rounded-md px-3 py-2
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:bg-black file:text-white
-            hover:file:bg-white
-            hover:file:text-black 
-            hover:file:border
-            hover:file:transition"
         />
 
         <button
@@ -226,14 +188,12 @@ const AdFormPage = () => {
         </button>
       </form>
 
-      {/* Ads Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {ads.map((ad) => (
           <AdCard key={ad._id} ad={ad} />
         ))}
       </div>
 
-      {/* Limit Modal */}
       {showLimitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
