@@ -2,45 +2,85 @@ import React, { useEffect, useState } from "react";
 
 const AdminShifting = () => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // ✅ Backend API
   const API = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    if (!API) {
+      console.error("❌ VITE_API_URL is missing");
+      return;
+    }
     fetchOrders();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [API]);
 
   const fetchOrders = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${API}/api/shifting-orders`);
       const data = await res.json();
-      setOrders(data);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching shifting orders:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ FRONTEND DELETE ONLY
-  const handleDeleteOrder = (_id) => {
-    if (!window.confirm("Delete this shifting order?")) return;
+  // ✅ DELETE (real backend delete)
+  const handleDeleteOrder = async (_id) => {
+    if (!window.confirm("Delete this shifting order permanently?")) return;
 
-    setOrders((prev) => prev.filter((o) => o._id !== _id));
+    try {
+      const res = await fetch(`${API}/api/shifting-orders?id=${_id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setOrders((prev) => prev.filter((o) => o._id !== _id));
+        alert("✅ Shifting order deleted!");
+      } else {
+        alert(data?.message || "❌ Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Delete shifting order error:", error);
+      alert("❌ Error deleting order");
+    }
   };
 
-  // ✅ FRONTEND COMPLETE ONLY
-  const handleMarkComplete = (_id) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o._id === _id ? { ...o, status: "Completed" } : o
-      )
-    );
+  // ✅ COMPLETE (real backend complete)
+  const handleMarkComplete = async (_id) => {
+    try {
+      const res = await fetch(
+        `${API}/api/shifting-orders?id=${_id}&action=complete`,
+        { method: "PUT" }
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        setOrders((prev) =>
+          prev.map((o) => (o._id === _id ? { ...o, status: "Completed" } : o))
+        );
+        alert("✅ Marked as completed!");
+      } else {
+        alert(data?.message || "❌ Failed to update order");
+      }
+    } catch (error) {
+      console.error("Complete shifting order error:", error);
+      alert("❌ Error updating order");
+    }
   };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold mb-6">🚚 Manage Shifting Orders</h1>
 
-      {orders.length === 0 ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : orders.length === 0 ? (
         <p>No shifting orders found.</p>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -71,9 +111,7 @@ const AdminShifting = () => {
                   <td className="border p-2 text-center">
                     <span
                       className={`px-2 py-1 rounded text-white ${
-                        o.status === "Completed"
-                          ? "bg-green-600"
-                          : "bg-yellow-500"
+                        o.status === "Completed" ? "bg-green-600" : "bg-yellow-500"
                       }`}
                     >
                       {o.status || "Pending"}
@@ -100,7 +138,6 @@ const AdminShifting = () => {
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       )}

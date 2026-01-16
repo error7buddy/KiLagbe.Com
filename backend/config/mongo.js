@@ -1,19 +1,19 @@
 import mongoose from "mongoose";
 
-let isConnected = false; // prevent multiple connections
+const MONGO_URI = process.env.MONGO_URI;
 
-const connectDB = async () => {
-  if (isConnected) {
+if (!MONGO_URI) {
+  throw new Error("❌ MONGO_URI is missing in environment variables");
+}
+
+const connectMongo = async () => {
+  // Reuse existing connection if already connected
+  if (mongoose.connection.readyState === 1) {
     return;
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    isConnected = db.connections[0].readyState === 1;
+    await mongoose.connect(MONGO_URI);
     console.log("✅ MongoDB connected");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error.message);
@@ -21,4 +21,4 @@ const connectDB = async () => {
   }
 };
 
-export default connectDB;
+export default connectMongo;

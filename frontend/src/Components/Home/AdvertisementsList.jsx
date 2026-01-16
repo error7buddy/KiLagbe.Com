@@ -7,25 +7,37 @@ export default function AdvertisementList() {
   const [filteredAds, setFilteredAds] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Backend API from env
+  const API = import.meta.env.VITE_API_URL;
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const ADS_PER_PAGE = 9;
 
-  // Fetch all ads
+  // ✅ Fetch all ads from backend
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/ads");
-        setAds(res.data);
-        setFilteredAds(res.data);
+        if (!API) {
+          console.error("❌ VITE_API_URL is missing");
+          setAds([]);
+          setFilteredAds([]);
+          return;
+        }
+
+        const res = await axios.get(`${API}/api/ads`);
+        const list = Array.isArray(res.data) ? res.data : [];
+        setAds(list);
+        setFilteredAds(list);
       } catch (err) {
-        console.error(err);
+        console.error("Fetch ads error:", err?.response?.data || err.message);
       } finally {
         setLoading(false);
       }
     };
+
     fetchAds();
-  }, []);
+  }, [API]);
 
   // Filter ads whenever searchTerm changes
   useEffect(() => {
@@ -47,7 +59,7 @@ export default function AdvertisementList() {
     });
 
     setFilteredAds(filtered);
-    setCurrentPage(1); // reset to first page on search
+    setCurrentPage(1);
   }, [searchTerm, ads]);
 
   if (loading) return <p className="text-center mt-6">Loading ads...</p>;
@@ -106,23 +118,31 @@ export default function AdvertisementList() {
               key={ad._id}
               className="border rounded-lg shadow bg-white overflow-hidden"
             >
-              {ad.images?.length > 0 && (
-                <img
-                  src={`http://localhost:5000/uploads/${ad.images[0]}`}
-                  className="h-48 w-full object-cover"
-                  alt={ad.title || "ad"}
-                />
+              {/* ⚠️ Vercel serverless can't serve /uploads */}
+              {ad.images?.length > 0 ? (
+                <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                  Image not available on Vercel (use Cloudinary/Firebase)
+                </div>
+              ) : (
+                <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                  No image
+                </div>
               )}
 
               <div className="p-4">
                 <h2 className="font-bold text-lg">{ad.title}</h2>
                 <p className="text-sm text-gray-600">
-                  {ad.address?.area || "Unknown Area"}, {ad.address?.district || "Unknown District"}
+                  {ad.address?.area || "Unknown Area"},{" "}
+                  {ad.address?.district || "Unknown District"}
                 </p>
                 <p className="mt-2">{ad.bhk || "N/A"} BHK</p>
-                <p className="text-sm text-gray-500 mt-2">{ad.description || "No description available."}</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  {ad.description || "No description available."}
+                </p>
                 {ad.address?.phone && (
-                  <p className="text-sm text-gray-700 mt-2">📞 {ad.address.phone}</p>
+                  <p className="text-sm text-gray-700 mt-2">
+                    📞 {ad.address.phone}
+                  </p>
                 )}
               </div>
             </div>
@@ -140,15 +160,19 @@ export default function AdvertisementList() {
           >
             Prev
           </button>
+
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
             <button
               key={num}
               onClick={() => goToPage(num)}
-              className={`px-3 py-1 border rounded ${num === currentPage ? "bg-black text-white" : ""}`}
+              className={`px-3 py-1 border rounded ${
+                num === currentPage ? "bg-black text-white" : ""
+              }`}
             >
               {num}
             </button>
           ))}
+
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}

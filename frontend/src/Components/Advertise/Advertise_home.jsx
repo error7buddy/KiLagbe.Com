@@ -7,22 +7,31 @@ import { useNavigate } from "react-router-dom";
 const API = import.meta.env.VITE_API_URL;
 
 const AdCard = ({ ad }) => {
+  const hasImages = Array.isArray(ad.images) && ad.images.length > 0;
+
   return (
     <div className="max-w-sm bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 cursor-pointer">
-      {ad.images?.length > 0 && (
-        <img
-          src={`${API}/uploads/${ad.images[0]}`} // updated to use API variable
-          alt={ad.title}
-          className="w-full h-48 object-cover"
-        />
+      {/* ⚠️ Vercel can't serve /uploads, so show a safe placeholder */}
+      {hasImages ? (
+        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+          Image not available on Vercel (use Cloudinary/Firebase)
+        </div>
+      ) : (
+        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+          No image
+        </div>
       )}
+
       <div className="p-4">
         <h3 className="text-lg font-bold mb-2">{ad.title}</h3>
         <p className="text-gray-600 text-sm mb-2">{ad.description}</p>
-        <p className="text-gray-800 font-semibold">{ad.bhk} BHK - {ad.area}</p>
-        <p className="text-gray-600 text-sm">{ad.district}</p>
-        {ad.phone && (
-          <p className="text-gray-700 text-sm mt-1">📞 {ad.phone}</p>
+
+        {/* ✅ Your backend stores area/district/phone inside address */}
+        <p className="text-gray-800 font-semibold">{ad.bhk} BHK - {ad.address?.area}</p>
+        <p className="text-gray-600 text-sm">{ad.address?.district}</p>
+
+        {ad.address?.phone && (
+          <p className="text-gray-700 text-sm mt-1">📞 {ad.address.phone}</p>
         )}
       </div>
     </div>
@@ -40,28 +49,31 @@ const AdFormPage = () => {
     phone: "",
     images: [],
   });
+
   const [ads, setAds] = useState([]);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch ads from backend
+  // ✅ Fetch ads from backend (backend returns ARRAY directly)
   const fetchAds = async () => {
     try {
+      if (!API) return console.error("❌ VITE_API_URL missing");
       const res = await axios.get(`${API}/api/ads`);
-      setAds(res.data.ads || []);
+      setAds(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch ads error:", err?.response?.data || err.message);
     }
   };
 
   useEffect(() => {
+    if (!API) return;
     fetchAds();
-  }, []);
+  }, [API]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "images") {
-      setFormData((prev) => ({ ...prev, images: files }));
+      setFormData((prev) => ({ ...prev, images: files ? Array.from(files) : [] }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -69,9 +81,12 @@ const AdFormPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const user = auth.currentUser;
       if (!user) return alert("Please login first");
+
+      if (!API) return alert("VITE_API_URL missing in frontend env");
 
       const data = new FormData();
       data.append("userId", user.uid);
@@ -83,11 +98,16 @@ const AdFormPage = () => {
       data.append("district", formData.district);
       data.append("phone", formData.phone);
 
-      for (let i = 0; i < formData.images.length; i++) {
-        data.append("images", formData.images[i]);
+      // images
+      if (formData.images && formData.images.length > 0) {
+        for (let i = 0; i < formData.images.length; i++) {
+          data.append("images", formData.images[i]);
+        }
       }
 
-      const res = await axios.post(`${API}/api/ads`, data);
+      const res = await axios.post(`${API}/api/ads`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (res.data.success) {
         alert("✅ Ad posted successfully!");
@@ -101,13 +121,17 @@ const AdFormPage = () => {
           phone: "",
           images: [],
         });
-        fetchAds(); // Refresh ads after posting
+        fetchAds();
+      } else {
+        alert(res.data.message || "❌ Failed to post ad");
       }
     } catch (err) {
-      if (err.response?.status === 403) {
+      const status = err?.response?.status;
+
+      if (status === 403) {
         setShowLimitModal(true);
       } else {
-        alert(err.response?.data?.message || "Error posting ad");
+        alert(err?.response?.data?.message || "Error posting ad");
       }
     }
   };
@@ -178,20 +202,22 @@ const AdFormPage = () => {
           onChange={handleChange}
           className="w-full p-2 mb-2 border rounded"
         />
+
         <input
           type="file"
           name="images"
           onChange={handleChange}
           multiple
           className="w-full mb-2 border border-gray-300 rounded-md px-3 py-2
-             file:mr-4 file:py-2 file:px-4
-             file:rounded-md file:border-0
-             file:bg-black file:text-white
-             hover:file:bg-white
-             hover:file:text-black 
-             hover:file:border
-             hover:file:transition"
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0
+            file:bg-black file:text-white
+            hover:file:bg-white
+            hover:file:text-black 
+            hover:file:border
+            hover:file:transition"
         />
+
         <button
           type="submit"
           className="w-full bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"

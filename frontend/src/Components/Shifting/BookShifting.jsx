@@ -18,33 +18,49 @@ const BookShifting = () => {
   });
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const resetForm = () => {
+    setForm({
+      name: "",
+      phone: "",
+      from_location: "",
+      from_floor: "",
+      to_location: "",
+      to_floor: "",
+      shift_type: "",
+      date: "",
+      message: "",
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(`${API}/api/shifting-orders`, form);
+      if (!API) return alert("❌ VITE_API_URL missing in frontend env");
 
-      if (res.data.success) {
+      // ✅ Send ONLY fields that backend schema supports
+      const payload = {
+        name: form.name,
+        phone: form.phone,
+        from_location: form.from_location,
+        to_location: form.to_location,
+        shift_type: form.shift_type,
+        date: form.date,
+      };
+
+      const res = await axios.post(`${API}/api/shifting-orders`, payload);
+
+      if (res.data?.success) {
         alert("✅ Shifting order booked successfully!");
-        setForm({
-          name: "",
-          phone: "",
-          from_location: "",
-          from_floor: "",
-          to_location: "",
-          to_floor: "",
-          shift_type: "",
-          date: "",
-          message: "",
-        });
+        resetForm();
       } else {
-        alert("❌ Booking failed");
+        alert(res.data?.message || "❌ Booking failed");
       }
     } catch (err) {
-      console.error("Booking error:", err);
-      alert("❌ Failed to book shifting service");
+      console.error("Booking error:", err?.response?.data || err.message);
+      alert(err?.response?.data?.message || "❌ Failed to book shifting service");
     }
   };
 
@@ -61,6 +77,7 @@ const BookShifting = () => {
           className="w-full p-2 border rounded"
           required
         />
+
         <input
           name="phone"
           placeholder="Phone"
@@ -69,6 +86,7 @@ const BookShifting = () => {
           className="w-full p-2 border rounded"
           required
         />
+
         <input
           name="from_location"
           placeholder="From Location"
@@ -77,13 +95,16 @@ const BookShifting = () => {
           className="w-full p-2 border rounded"
           required
         />
+
+        {/* These are UI-only unless you also add them to backend schema */}
         <input
           name="from_floor"
-          placeholder="From Floor"
+          placeholder="From Floor (optional)"
           value={form.from_floor}
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
+
         <input
           name="to_location"
           placeholder="To Location"
@@ -92,9 +113,10 @@ const BookShifting = () => {
           className="w-full p-2 border rounded"
           required
         />
+
         <input
           name="to_floor"
-          placeholder="To Floor"
+          placeholder="To Floor (optional)"
           value={form.to_floor}
           onChange={handleChange}
           className="w-full p-2 border rounded"
@@ -122,9 +144,10 @@ const BookShifting = () => {
           required
         />
 
+        {/* UI-only unless you add message to backend schema */}
         <textarea
           name="message"
-          placeholder="Additional Message"
+          placeholder="Additional Message (optional)"
           value={form.message}
           onChange={handleChange}
           className="w-full p-2 border rounded"
@@ -137,6 +160,11 @@ const BookShifting = () => {
           Submit Booking
         </button>
       </form>
+
+      <p className="text-xs text-gray-500 mt-3">
+        Note: “Floor” and “Message” fields won’t be saved unless you add them to the backend
+        ShiftingOrder model.
+      </p>
     </div>
   );
 };
