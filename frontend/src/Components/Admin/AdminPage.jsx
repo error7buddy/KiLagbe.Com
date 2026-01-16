@@ -7,19 +7,15 @@ const AdminPage = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ Backend API from env
   const API = import.meta.env.VITE_API_URL;
 
-  // ✅ Check admin login
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin");
     if (!isAdmin) navigate("/login");
   }, [navigate]);
 
-  // ✅ Fetch all ads
   const fetchAds = async () => {
     try {
-      if (!API) return console.error("VITE_API_URL is missing");
       const res = await fetch(`${API}/api/ads`);
       const data = await res.json();
       setAds(Array.isArray(data) ? data : []);
@@ -28,10 +24,8 @@ const AdminPage = () => {
     }
   };
 
-  // ✅ Fetch all shifting orders
   const fetchOrders = async () => {
     try {
-      if (!API) return console.error("VITE_API_URL is missing");
       const res = await fetch(`${API}/api/shifting-orders`);
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
@@ -46,16 +40,14 @@ const AdminPage = () => {
     fetchOrders();
   }, [API]);
 
-  // ✅ Delete an ad permanently (Vercel route expects ?id=)
   const handleDeleteAd = async (_id) => {
-    if (!window.confirm("Are you sure you want to delete this ad permanently?")) return;
+    if (!window.confirm("Delete this ad permanently?")) return;
     try {
       const res = await fetch(`${API}/api/ads?id=${_id}`, { method: "DELETE" });
       const data = await res.json();
-
       if (data.success) {
         setAds((prev) => prev.filter((ad) => ad._id !== _id));
-        alert("✅ Ad deleted permanently!");
+        alert("✅ Ad deleted!");
       } else {
         alert(data?.message || "❌ Failed to delete ad");
       }
@@ -65,16 +57,14 @@ const AdminPage = () => {
     }
   };
 
-  // ✅ Delete a shifting order permanently (Vercel route expects ?id=)
   const handleDeleteOrder = async (_id) => {
-    if (!window.confirm("Are you sure you want to delete this shifting order permanently?")) return;
+    if (!window.confirm("Delete this shifting order permanently?")) return;
     try {
       const res = await fetch(`${API}/api/shifting-orders?id=${_id}`, { method: "DELETE" });
       const data = await res.json();
-
       if (data.success) {
         setOrders((prev) => prev.filter((o) => o._id !== _id));
-        alert("✅ Shifting order deleted permanently!");
+        alert("✅ Order deleted!");
       } else {
         alert(data?.message || "❌ Failed to delete order");
       }
@@ -84,35 +74,30 @@ const AdminPage = () => {
     }
   };
 
-  // ✅ Mark shifting order as complete (Vercel expects ?id= & action=complete)
   const handleCompleteOrder = async (_id) => {
     try {
       const res = await fetch(`${API}/api/shifting-orders?id=${_id}&action=complete`, {
         method: "PUT",
       });
       const data = await res.json();
-
       if (data.success) {
         setOrders((prev) =>
           prev.map((o) => (o._id === _id ? { ...o, status: "Completed" } : o))
         );
-        alert("✅ Order marked as completed!");
+        alert("✅ Order completed!");
       } else {
-        alert(data?.message || "❌ Failed to update order");
+        alert(data?.message || "❌ Failed to complete order");
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Error updating order");
+      alert("❌ Error completing order");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 relative">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        🛠 Admin Dashboard
-      </h1>
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">🛠 Admin Dashboard</h1>
 
-      {/* Logout */}
       <button
         onClick={() => {
           localStorage.removeItem("isAdmin");
@@ -123,14 +108,11 @@ const AdminPage = () => {
         Logout
       </button>
 
-      {/* Tabs */}
       <div className="flex justify-center mb-8">
         <button
           onClick={() => setActiveTab("ads")}
           className={`px-8 py-3 text-lg font-semibold transition ${
-            activeTab === "ads"
-              ? "bg-blue-600 text-white rounded-l-xl"
-              : "bg-white text-gray-700 border"
+            activeTab === "ads" ? "bg-blue-600 text-white rounded-l-xl" : "bg-white text-gray-700 border"
           }`}
         >
           Manage Ads
@@ -138,9 +120,7 @@ const AdminPage = () => {
         <button
           onClick={() => setActiveTab("shifting")}
           className={`px-8 py-3 text-lg font-semibold transition ${
-            activeTab === "shifting"
-              ? "bg-blue-600 text-white rounded-r-xl"
-              : "bg-white text-gray-700 border"
+            activeTab === "shifting" ? "bg-blue-600 text-white rounded-r-xl" : "bg-white text-gray-700 border"
           }`}
         >
           Manage Shifting
@@ -148,38 +128,27 @@ const AdminPage = () => {
       </div>
 
       <div className="bg-white shadow-md rounded-xl p-6">
-        {/* 🏠 Manage Ads */}
         {activeTab === "ads" && (
           <div>
-            <h2 className="text-2xl font-semibold mb-6 text-blue-700">
-              🏠 Advertisements
-            </h2>
-
+            <h2 className="text-2xl font-semibold mb-6 text-blue-700">🏠 Advertisements</h2>
             {ads.length === 0 ? (
               <p className="text-gray-600 text-center">No advertisements found.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {ads.map((ad) => (
-                  <div
-                    key={ad._id}
-                    className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
-                  >
+                  <div key={ad._id} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition">
                     <h3 className="text-lg font-bold mb-1">{ad.title || "No Title"}</h3>
                     <p className="text-sm text-gray-600 mb-1 line-clamp-2">
                       {ad.description || "No description"}
                     </p>
                     <p className="text-sm text-gray-500 mb-1">
-                      📍 {ad.address?.area || "Unknown Area"},{" "}
-                      {ad.address?.district || "Unknown District"}
+                      📍 {ad.address?.area || "Unknown Area"}, {ad.address?.district || "Unknown District"}
                     </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      📞 {ad.address?.phone || "N/A"}
-                    </p>
+                    <p className="text-sm text-gray-500 mb-2">📞 {ad.address?.phone || "N/A"}</p>
 
-                    {/* ⚠️ Vercel cannot serve /uploads files (serverless). Use Cloudinary/Firebase for real image URLs */}
                     {ad.images?.length > 0 && (
                       <p className="text-xs text-gray-500 mb-2">
-                        Images won’t display on Vercel unless you upload to Cloudinary/Firebase and store URLs.
+                        Images won’t show on Vercel unless you use Cloudinary/Firebase.
                       </p>
                     )}
 
@@ -196,13 +165,9 @@ const AdminPage = () => {
           </div>
         )}
 
-        {/* 🚚 Manage Shifting */}
         {activeTab === "shifting" && (
           <div>
-            <h2 className="text-2xl font-semibold mb-6 text-blue-700">
-              🚚 Shifting Orders
-            </h2>
-
+            <h2 className="text-2xl font-semibold mb-6 text-blue-700">🚚 Shifting Orders</h2>
             {orders.length === 0 ? (
               <p className="text-gray-600 text-center">No shifting orders found.</p>
             ) : (
@@ -220,7 +185,6 @@ const AdminPage = () => {
                       <th className="border p-2">Action</th>
                     </tr>
                   </thead>
-
                   <tbody>
                     {orders.map((o) => (
                       <tr key={o._id} className="hover:bg-gray-50">
@@ -230,7 +194,6 @@ const AdminPage = () => {
                         <td className="border p-2">{o.to_location}</td>
                         <td className="border p-2">{o.shift_type}</td>
                         <td className="border p-2">{o.date}</td>
-
                         <td className="border p-2 text-center">
                           {o.status === "Completed" ? (
                             <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
@@ -242,7 +205,6 @@ const AdminPage = () => {
                             </span>
                           )}
                         </td>
-
                         <td className="border p-2 text-center space-x-2">
                           {o.status !== "Completed" && (
                             <button

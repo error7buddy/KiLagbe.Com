@@ -14,12 +14,11 @@ export default function AdvertisementList() {
   const [currentPage, setCurrentPage] = useState(1);
   const ADS_PER_PAGE = 9;
 
-  // ✅ Fetch all ads from backend
   useEffect(() => {
     const fetchAds = async () => {
       try {
         if (!API) {
-          console.error("❌ VITE_API_URL is missing");
+          console.error("❌ VITE_API_URL missing");
           setAds([]);
           setFilteredAds([]);
           return;
@@ -39,7 +38,6 @@ export default function AdvertisementList() {
     fetchAds();
   }, [API]);
 
-  // Filter ads whenever searchTerm changes
   useEffect(() => {
     if (!searchTerm) {
       setFilteredAds(ads);
@@ -65,7 +63,6 @@ export default function AdvertisementList() {
   if (loading) return <p className="text-center mt-6">Loading ads...</p>;
   if (!ads.length) return <p className="text-center mt-6">No ads found</p>;
 
-  // Pagination logic
   const indexOfLastAd = currentPage * ADS_PER_PAGE;
   const indexOfFirstAd = indexOfLastAd - ADS_PER_PAGE;
   const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
@@ -79,7 +76,7 @@ export default function AdvertisementList() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      {/* Search Input */}
+      {/* Search */}
       <div className="mb-8 relative">
         <input
           type="text"
@@ -87,20 +84,11 @@ export default function AdvertisementList() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="
-            w-full
-            px-5 py-4
-            text-black
-            bg-white
-            border-2 border-black
-            rounded-full
-            shadow-md
-            placeholder-gray-500
-            transition-all duration-300
-            focus:outline-none
-            focus:bg-black
-            focus:text-white
-            focus:placeholder-gray-400
-            focus:shadow-xl
+            w-full px-5 py-4 text-black bg-white
+            border-2 border-black rounded-full shadow-md
+            placeholder-gray-500 transition-all duration-300
+            focus:outline-none focus:bg-black focus:text-white
+            focus:placeholder-gray-400 focus:shadow-xl
           "
         />
         <span className="absolute right-5 top-1/2 -translate-y-1/2 text-black pointer-events-none">
@@ -108,41 +96,29 @@ export default function AdvertisementList() {
         </span>
       </div>
 
-      {/* Ads Grid */}
+      {/* Grid */}
       {currentAds.length === 0 ? (
         <p className="text-center text-gray-500">No ads match your search.</p>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentAds.map((ad) => (
-            <div
-              key={ad._id}
-              className="border rounded-lg shadow bg-white overflow-hidden"
-            >
-              {/* ⚠️ Vercel serverless can't serve /uploads */}
-              {ad.images?.length > 0 ? (
-                <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-                  Image not available on Vercel (use Cloudinary/Firebase)
-                </div>
-              ) : (
-                <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-                  No image
-                </div>
-              )}
+            <div key={ad._id} className="border rounded-lg shadow bg-white overflow-hidden">
+              {/* ⚠️ Vercel can't serve /uploads */}
+              <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                {ad.images?.length ? "Image not available on Vercel" : "No image"}
+              </div>
 
               <div className="p-4">
                 <h2 className="font-bold text-lg">{ad.title}</h2>
                 <p className="text-sm text-gray-600">
-                  {ad.address?.area || "Unknown Area"},{" "}
-                  {ad.address?.district || "Unknown District"}
+                  {ad.address?.area || "Unknown Area"}, {ad.address?.district || "Unknown District"}
                 </p>
                 <p className="mt-2">{ad.bhk || "N/A"} BHK</p>
                 <p className="text-sm text-gray-500 mt-2">
                   {ad.description || "No description available."}
                 </p>
                 {ad.address?.phone && (
-                  <p className="text-sm text-gray-700 mt-2">
-                    📞 {ad.address.phone}
-                  </p>
+                  <p className="text-sm text-gray-700 mt-2">📞 {ad.address.phone}</p>
                 )}
               </div>
             </div>
@@ -150,7 +126,7 @@ export default function AdvertisementList() {
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-6 gap-2 flex-wrap">
           <button
@@ -165,9 +141,7 @@ export default function AdvertisementList() {
             <button
               key={num}
               onClick={() => goToPage(num)}
-              className={`px-3 py-1 border rounded ${
-                num === currentPage ? "bg-black text-white" : ""
-              }`}
+              className={`px-3 py-1 border rounded ${num === currentPage ? "bg-black text-white" : ""}`}
             >
               {num}
             </button>
