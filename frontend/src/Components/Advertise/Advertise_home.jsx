@@ -1,31 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { auth } from "../../Firebase/config";
 import { useNavigate } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL;
-
-const AdCard = ({ ad }) => {
-  return (
-    <div className="max-w-sm bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-        {ad.images?.length ? "Image URL needed (Cloudinary/Firebase)" : "No image"}
-      </div>
-
-      <div className="p-4">
-        <h3 className="text-lg font-bold mb-2">{ad.title}</h3>
-        <p className="text-gray-600 text-sm mb-2">{ad.description}</p>
-        <p className="text-gray-800 font-semibold">
-          {ad.bhk} BHK - {ad.address?.area}
-        </p>
-        <p className="text-gray-600 text-sm">{ad.address?.district}</p>
-        {ad.address?.phone && (
-          <p className="text-gray-700 text-sm mt-1">📞 {ad.address.phone}</p>
-        )}
-      </div>
-    </div>
-  );
-};
 
 const AdFormPage = () => {
   const [formData, setFormData] = useState({
@@ -36,29 +14,24 @@ const AdFormPage = () => {
     area: "",
     district: "",
     phone: "",
+    images: [],
   });
 
-  const [ads, setAds] = useState([]);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const navigate = useNavigate();
 
-  const fetchAds = async () => {
-    try {
-      if (!API) return console.error("❌ VITE_API_URL missing");
-      const res = await axios.get(`${API}/api/ads`);
-      setAds(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Fetch ads error:", err?.response?.data || err.message);
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+
+    if (name === "images") {
+      setFormData((prev) => ({
+        ...prev,
+        images: files ? Array.from(files) : [],
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
-
-  useEffect(() => {
-    if (!API) return;
-    fetchAds();
-  }, [API]);
-
-  const handleChange = (e) =>
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,8 +39,9 @@ const AdFormPage = () => {
     try {
       const user = auth.currentUser;
       if (!user) return alert("Please login first");
-      if (!API) return alert("VITE_API_URL missing");
+      if (!API) return alert("❌ VITE_API_URL missing in env");
 
+      // ✅ Sending JSON only (images not supported on Vercel uploads)
       const payload = {
         userId: user.uid,
         title: formData.title,
@@ -77,7 +51,7 @@ const AdFormPage = () => {
         area: formData.area,
         district: formData.district,
         phone: formData.phone,
-        images: [], // later store Cloudinary/Firebase URLs here
+        images: [], // store Cloudinary/Firebase URLs later
       };
 
       const res = await axios.post(`${API}/api/ads`, payload, {
@@ -94,8 +68,9 @@ const AdFormPage = () => {
           area: "",
           district: "",
           phone: "",
+          images: [],
         });
-        fetchAds();
+        navigate("/profile"); // ✅ go to profile after posting
       } else {
         alert(res.data.message || "❌ Failed to post ad");
       }
@@ -180,34 +155,41 @@ const AdFormPage = () => {
           className="w-full p-2 mb-2 border rounded"
         />
 
+        {/* keep input if you want, but it won't upload to Vercel storage */}
+        <input
+          type="file"
+          name="images"
+          onChange={handleChange}
+          multiple
+          className="w-full mb-2 border border-gray-300 rounded-md px-3 py-2"
+        />
+
         <button
           type="submit"
           className="w-full bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
         >
           Post Ad
         </button>
+
+        <p className="text-xs text-gray-500 mt-3">
+          Note: Images won’t upload on Vercel unless you use Cloudinary/Firebase Storage.
+        </p>
       </form>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {ads.map((ad) => (
-          <AdCard key={ad._id} ad={ad} />
-        ))}
-      </div>
-
+      {/* Limit Modal */}
       {showLimitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
           <div className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center shadow-lg z-10">
             <h3 className="text-lg font-bold mb-4">⚠️ Limit Reached</h3>
             <p className="mb-4">
-              You have reached your free ad limit. Delete an existing ad from
-              your profile to post a new one.
+              You have reached your free ad limit. Delete an existing ad from your profile to post a new one.
             </p>
             <button
               onClick={() => navigate("/profile")}
               className="bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
             >
-              OK
+              Go to Profile
             </button>
           </div>
         </div>

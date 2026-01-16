@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 
-const API = import.meta.env.VITE_API_URL; // ✅ Use env variable
+const API = import.meta.env.VITE_API_URL;
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [ads, setAds] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ Check auth and set user
+  /* ---------------- AUTH ---------------- */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser) navigate("/auth");
@@ -20,41 +20,44 @@ const Profile = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  // ✅ Fetch ads for this user
-  const fetchUserAds = async () => {
-    if (!user) return;
+  /* ---------------- FETCH USER ADS ---------------- */
+  const fetchUserAds = async (uid) => {
     try {
-      const res = await fetch(`${API}/api/ads/user/${user.uid}`); // ✅ changed URL
+      const res = await fetch(`${API}/api/ads?userId=${uid}`);
       const data = await res.json();
-      setAds(data);
+      setAds(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching user ads:", err);
     }
   };
 
   useEffect(() => {
-    if (user) fetchUserAds();
+    if (user?.uid) fetchUserAds(user.uid);
   }, [user]);
 
-  // ✅ Delete ad
+  /* ---------------- DELETE AD ---------------- */
   const handleDeleteAd = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this ad?")) return;
+
     try {
-      const res = await fetch(`${API}/api/ads/${_id}`, { method: "DELETE" }); // ✅ changed URL
+      const res = await fetch(`${API}/api/ads?id=${_id}`, {
+        method: "DELETE",
+      });
       const data = await res.json();
+
       if (data.success) {
         setAds((prev) => prev.filter((ad) => ad._id !== _id));
-        alert("Ad deleted successfully!");
+        alert("✅ Ad deleted successfully!");
       } else {
-        alert("Failed to delete ad.");
+        alert(data.message || "❌ Failed to delete ad");
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting ad.");
+      alert("❌ Error deleting ad");
     }
   };
 
-  // ✅ Edit ad
+  /* ---------------- EDIT AD ---------------- */
   const handleEditAd = (_id) => {
     navigate(`/edit-ad/${_id}`);
   };
@@ -65,7 +68,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-6xl mx-auto px-4 space-y-10">
 
-        {/* ===== Profile Card ===== */}
+        {/* ===== PROFILE CARD ===== */}
         <div className="bg-white rounded-xl shadow-md p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6">
           <img
             src={user.photoURL || "https://i.ibb.co.com/sJjJnc3T/image.png"}
@@ -82,7 +85,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* ===== Ads Section ===== */}
+        {/* ===== ADS SECTION ===== */}
         <div>
           <h2 className="text-2xl font-semibold mb-4">My Ads</h2>
 
@@ -104,27 +107,26 @@ const Profile = () => {
                   </p>
 
                   <p className="text-sm text-gray-500 mb-3">
-                    📍 {ad.address.area}, {ad.address.district}
+                    📍 {ad.address?.area}, {ad.address?.district}
                   </p>
 
+                  {/* ⚠️ Vercel note */}
                   {ad.images?.[0] && (
-                    <img
-                      src={`${API}/uploads/${ad.images[0]}`} // ✅ changed URL
-                      alt="ad"
-                      className="w-full h-40 object-cover rounded-lg mb-4"
-                    />
+                    <div className="w-full h-40 flex items-center justify-center bg-gray-100 rounded-lg mb-4 text-xs text-gray-500">
+                      Image requires Cloudinary / Firebase Storage
+                    </div>
                   )}
 
                   <div className="mt-auto flex gap-2">
                     <button
                       onClick={() => handleEditAd(ad._id)}
-                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
+                      className="flex-1 bg-black text-white py-2 rounded hover:bg-white hover:text-black border transition"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteAd(ad._id)}
-                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
+                      className="flex-1 bg-black text-white py-2 rounded hover:bg-white hover:text-black border transition"
                     >
                       Delete
                     </button>
