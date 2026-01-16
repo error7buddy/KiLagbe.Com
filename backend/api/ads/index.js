@@ -1,11 +1,40 @@
 import Advertisement from "../../models/Advertisement.js";
 import connectMongo from "../../config/mongo.js";
 
+// ✅ Allowed origins
+const allowedOrigins = [
+  "https://ki-lagbe-com.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+function setCors(res, origin) {
+  if (!origin) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  } else if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "https://ki-lagbe-com.vercel.app");
+  }
+
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+}
+
 export default async function handler(req, res) {
+  const origin = req.headers.origin;
+  setCors(res, origin);
+
+  // ✅ Preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   try {
     await connectMongo();
 
-    // ✅ POST (JSON only)
+    // ✅ POST (JSON)
     if (req.method === "POST") {
       const {
         userId,
@@ -26,7 +55,6 @@ export default async function handler(req, res) {
         });
       }
 
-      // Free ad limit check
       const userAdsCount = await Advertisement.countDocuments({ userId });
       const FREE_AD_LIMIT = 2;
 
@@ -63,7 +91,7 @@ export default async function handler(req, res) {
       return res.status(200).json(ads);
     }
 
-    // ✅ DELETE (expects ?id=)
+    // ✅ DELETE (?id=)
     if (req.method === "DELETE") {
       const { id } = req.query;
 
