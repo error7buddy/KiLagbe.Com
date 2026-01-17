@@ -49,27 +49,36 @@ const Profile = () => {
   }, [user]);
 
   // ✅ Delete ad (backend expects ?id=) — no headers to avoid preflight issues
-  const handleDeleteAd = async (_id) => {
-    if (!window.confirm("Are you sure you want to delete this ad?")) return;
+ const handleDeleteAd = async (_id) => {
+  if (!window.confirm("Are you sure you want to delete this ad?")) return;
 
-    try {
-      if (!API) return alert("❌ VITE_API_URL missing in env");
+  try {
+    if (!API) return alert("❌ VITE_API_URL missing");
 
-      const url = `${API}/api/ads?id=${encodeURIComponent(_id)}`;
-      const res = await fetch(url, { method: "DELETE" });
-      const data = await res.json();
+    const url = `${API}/api/ads?id=${encodeURIComponent(_id)}`;
+    console.log("DELETE URL:", url);
 
-      if (res.ok && data.success) {
-        setAds((prev) => prev.filter((ad) => ad._id !== _id));
-        alert("✅ Ad deleted successfully!");
-      } else {
-        alert(data.message || `❌ Failed to delete ad (status ${res.status})`);
-      }
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("❌ Error deleting ad");
+    // ✅ no headers -> avoids OPTIONS preflight issues
+    const res = await fetch(url, { method: "DELETE" });
+
+    const text = await res.text();
+    console.log("DELETE STATUS:", res.status);
+    console.log("DELETE RAW:", text);
+
+    let data = {};
+    try { data = JSON.parse(text); } catch {}
+
+    if (res.ok && data.success) {
+      setAds((prev) => prev.filter((ad) => ad._id !== _id));
+      alert("✅ Ad deleted!");
+    } else {
+      alert(data.message || `❌ Delete failed (status ${res.status})`);
     }
-  };
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("❌ Delete blocked (check Network tab)");
+  }
+};
 
   // ✅ Edit ad
   const handleEditAd = (_id) => {
