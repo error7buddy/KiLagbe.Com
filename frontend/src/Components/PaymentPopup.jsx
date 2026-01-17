@@ -44,27 +44,31 @@ export default function PaymentPopup({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-96 p-6 relative">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-[92vw] max-w-md p-5 sm:p-6 relative max-h-[85vh] overflow-auto">
         <button
           onClick={onClose}
           className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"
+          aria-label="Close"
         >
           ✕
         </button>
 
         {step === 1 && (
           <>
-            <h2 className="text-xl font-bold mb-4 text-center">Upgrade to Premium</h2>
-            <p className="text-gray-600 text-sm text-center mb-4">
+            <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-center">
+              Upgrade to Premium
+            </h2>
+            <p className="text-gray-600 text-xs sm:text-sm text-center mb-4">
               Choose your preferred payment method:
             </p>
-            <div className="grid grid-cols-2 gap-3">
+
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
               {["Bkash", "Nagad", "Rocket", "Stripe"].map((m) => (
                 <button
                   key={m}
                   onClick={() => setMethod(m)}
-                  className={`border rounded-lg p-3 text-center ${
+                  className={`border rounded-lg p-3 text-center text-sm sm:text-base transition ${
                     method === m
                       ? "border-blue-600 bg-blue-50 text-blue-700"
                       : "border-gray-300 hover:bg-gray-100"
@@ -74,9 +78,10 @@ export default function PaymentPopup({ onClose, onSuccess }) {
                 </button>
               ))}
             </div>
+
             <button
               onClick={handleNext}
-              className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+              className="mt-5 sm:mt-6 w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition"
             >
               Continue
             </button>
@@ -85,30 +90,36 @@ export default function PaymentPopup({ onClose, onSuccess }) {
 
         {step === 2 && (
           <>
-            <h2 className="text-lg font-bold mb-4 text-center">Complete Payment</h2>
-            <p className="text-gray-600 text-sm mb-4 text-center">
+            <h2 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-center">
+              Complete Payment
+            </h2>
+
+            <p className="text-gray-600 text-xs sm:text-sm mb-4 text-center">
               Send payment to official {method} number:
               <br />
               <span className="font-semibold text-black">01911-123456</span>
             </p>
+
             <input
               type="text"
               placeholder="Enter Transaction ID"
               value={trxId}
               onChange={(e) => setTrxId(e.target.value)}
-              className="w-full border p-2 rounded mb-4"
+              className="w-full border p-2.5 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-green-500/30"
             />
-            <div className="flex gap-3">
+
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 border border-gray-400 rounded-lg py-2 hover:bg-gray-100"
+                className="w-full sm:flex-1 border border-gray-400 rounded-lg py-2.5 hover:bg-gray-100 transition"
               >
                 Back
               </button>
+
               <button
                 onClick={confirmPayment}
                 disabled={loading}
-                className="flex-1 bg-green-600 text-white rounded-lg py-2 hover:bg-green-700 disabled:opacity-50"
+                className="w-full sm:flex-1 bg-green-600 text-white rounded-lg py-2.5 hover:bg-green-700 transition disabled:opacity-50"
               >
                 {loading ? "Processing..." : "Confirm Payment"}
               </button>

@@ -97,176 +97,254 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 relative">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        🛠 Admin Dashboard
-      </h1>
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center sm:text-left">
+            🛠 Admin Dashboard
+          </h1>
 
-      <button
-        onClick={() => {
-          localStorage.removeItem("isAdmin");
-          navigate("/login");
-        }}
-        className="absolute top-6 right-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-      >
-        Logout
-      </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("isAdmin");
+              navigate("/login");
+            }}
+            className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+          >
+            Logout
+          </button>
+        </div>
 
-      <div className="flex justify-center mb-8">
-        <button
-          onClick={() => setActiveTab("ads")}
-          className={`px-8 py-3 text-lg font-semibold transition ${
-            activeTab === "ads"
-              ? "bg-blue-600 text-white rounded-l-xl"
-              : "bg-white text-gray-700 border"
-          }`}
-        >
-          Manage Ads
-        </button>
-        <button
-          onClick={() => setActiveTab("shifting")}
-          className={`px-8 py-3 text-lg font-semibold transition ${
-            activeTab === "shifting"
-              ? "bg-blue-600 text-white rounded-r-xl"
-              : "bg-white text-gray-700 border"
-          }`}
-        >
-          Manage Shifting
-        </button>
-      </div>
+        {/* Tabs */}
+        <div className="mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto gap-2 sm:gap-0">
+            <button
+              onClick={() => setActiveTab("ads")}
+              className={`w-full px-6 py-3 text-base sm:text-lg font-semibold transition rounded-xl sm:rounded-r-none ${
+                activeTab === "ads"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 border"
+              }`}
+            >
+              Manage Ads
+            </button>
 
-      <div className="bg-white shadow-md rounded-xl p-6">
-        {activeTab === "ads" && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-6 text-blue-700">
-              🏠 Advertisements
-            </h2>
-
-            {ads.length === 0 ? (
-              <p className="text-gray-600 text-center">No advertisements found.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {ads.map((ad) => {
-                  const img = ad.images?.[0];
-                  const showImg = isUrl(img);
-
-                  return (
-                    <div
-                      key={ad._id}
-                      className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
-                    >
-                      <h3 className="text-lg font-bold mb-1">{ad.title || "No Title"}</h3>
-                      <p className="text-sm text-gray-600 mb-1 line-clamp-2">
-                        {ad.description || "No description"}
-                      </p>
-                      <p className="text-sm text-gray-500 mb-1">
-                        📍 {ad.address?.area || "Unknown Area"},{" "}
-                        {ad.address?.district || "Unknown District"}
-                      </p>
-                      <p className="text-sm text-gray-500 mb-2">
-                        📞 {ad.address?.phone || "N/A"}
-                      </p>
-
-                      {/* ✅ Cloudinary Image */}
-                      {showImg ? (
-                        <img
-                          src={img}
-                          alt={ad.title || "Ad"}
-                          className="w-full h-40 object-cover rounded mb-3"
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-xs text-gray-500">
-                          No image
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => handleDeleteAd(ad._id)}
-                        className="mt-2 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
-                      >
-                        Delete Ad
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <button
+              onClick={() => setActiveTab("shifting")}
+              className={`w-full px-6 py-3 text-base sm:text-lg font-semibold transition rounded-xl sm:rounded-l-none ${
+                activeTab === "shifting"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 border"
+              }`}
+            >
+              Manage Shifting
+            </button>
           </div>
-        )}
+        </div>
 
-        {activeTab === "shifting" && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-6 text-blue-700">
-              🚚 Shifting Orders
-            </h2>
+        {/* Content */}
+        <div className="bg-white shadow-md rounded-xl p-4 sm:p-6">
+          {activeTab === "ads" && (
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-blue-700">
+                🏠 Advertisements
+              </h2>
 
-            {orders.length === 0 ? (
-              <p className="text-gray-600 text-center">No shifting orders found.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 text-sm">
-                  <thead className="bg-gray-100 text-gray-700">
-                    <tr>
-                      <th className="border p-2">Name</th>
-                      <th className="border p-2">Phone</th>
-                      <th className="border p-2">From</th>
-                      <th className="border p-2">To</th>
-                      <th className="border p-2">Type</th>
-                      <th className="border p-2">Date</th>
-                      <th className="border p-2">Status</th>
-                      <th className="border p-2">Action</th>
-                    </tr>
-                  </thead>
+              {ads.length === 0 ? (
+                <p className="text-gray-600 text-center">No advertisements found.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {ads.map((ad) => {
+                    const img = ad.images?.[0];
+                    const showImg = isUrl(img);
 
-                  <tbody>
+                    return (
+                      <div
+                        key={ad._id}
+                        className="border rounded-lg p-4 shadow-sm hover:shadow-md transition flex flex-col"
+                      >
+                        <h3 className="text-base sm:text-lg font-bold mb-1 break-words">
+                          {ad.title || "No Title"}
+                        </h3>
+
+                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                          {ad.description || "No description"}
+                        </p>
+
+                        <p className="text-sm text-gray-500 mb-1">
+                          📍 {ad.address?.area || "Unknown Area"},{" "}
+                          {ad.address?.district || "Unknown District"}
+                        </p>
+                        <p className="text-sm text-gray-500 mb-3">
+                          📞 {ad.address?.phone || "N/A"}
+                        </p>
+
+                        {/* ✅ Cloudinary Image */}
+                        {showImg ? (
+                          <img
+                            src={img}
+                            alt={ad.title || "Ad"}
+                            className="w-full h-40 sm:h-44 object-cover rounded mb-3"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-40 sm:h-44 bg-gray-100 rounded mb-3 flex items-center justify-center text-xs text-gray-500">
+                            No image
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => handleDeleteAd(ad._id)}
+                          className="mt-auto w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+                        >
+                          Delete Ad
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "shifting" && (
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-blue-700">
+                🚚 Shifting Orders
+              </h2>
+
+              {orders.length === 0 ? (
+                <p className="text-gray-600 text-center">No shifting orders found.</p>
+              ) : (
+                <>
+                  {/* Mobile Cards (sm and below) */}
+                  <div className="grid grid-cols-1 gap-4 sm:hidden">
                     {orders.map((o) => (
-                      <tr key={o._id} className="hover:bg-gray-50">
-                        <td className="border p-2">{o.name}</td>
-                        <td className="border p-2">{o.phone}</td>
-                        <td className="border p-2">{o.from_location}</td>
-                        <td className="border p-2">{o.to_location}</td>
-                        <td className="border p-2">{o.shift_type}</td>
-                        <td className="border p-2">{o.date}</td>
-                        <td className="border p-2 text-center">
-                          {o.status === "Completed" ? (
-                            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                              Completed
-                            </span>
-                          ) : (
-                            <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">
-                              Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="border p-2 text-center space-x-2">
+                      <div key={o._id} className="border rounded-lg p-4 bg-white shadow-sm">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 break-words">{o.name}</p>
+                            <p className="text-sm text-gray-600">{o.phone}</p>
+                          </div>
+
+                          <div className="shrink-0">
+                            {o.status === "Completed" ? (
+                              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                Completed
+                              </span>
+                            ) : (
+                              <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">
+                                Pending
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-3 space-y-1 text-sm text-gray-700">
+                          <p>
+                            <span className="text-gray-500">From:</span>{" "}
+                            <span className="break-words">{o.from_location}</span>
+                          </p>
+                          <p>
+                            <span className="text-gray-500">To:</span>{" "}
+                            <span className="break-words">{o.to_location}</span>
+                          </p>
+                          <p>
+                            <span className="text-gray-500">Type:</span> {o.shift_type}
+                          </p>
+                          <p>
+                            <span className="text-gray-500">Date:</span> {o.date}
+                          </p>
+                        </div>
+
+                        <div className="mt-4 flex gap-2">
                           {o.status !== "Completed" && (
                             <button
                               onClick={() => handleCompleteOrder(o._id)}
-                              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                              className="flex-1 bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
                             >
                               Complete
                             </button>
                           )}
                           <button
                             onClick={() => handleDeleteOrder(o._id)}
-                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                            className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
                           >
                             Delete
                           </button>
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
+                  </div>
 
-                </table>
-              </div>
-            )}
-          </div>
-        )}
+                  {/* Table (sm and up) */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 text-sm">
+                      <thead className="bg-gray-100 text-gray-700">
+                        <tr>
+                          <th className="border p-2 whitespace-nowrap">Name</th>
+                          <th className="border p-2 whitespace-nowrap">Phone</th>
+                          <th className="border p-2 whitespace-nowrap">From</th>
+                          <th className="border p-2 whitespace-nowrap">To</th>
+                          <th className="border p-2 whitespace-nowrap">Type</th>
+                          <th className="border p-2 whitespace-nowrap">Date</th>
+                          <th className="border p-2 whitespace-nowrap">Status</th>
+                          <th className="border p-2 whitespace-nowrap">Action</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {orders.map((o) => (
+                          <tr key={o._id} className="hover:bg-gray-50">
+                            <td className="border p-2">{o.name}</td>
+                            <td className="border p-2">{o.phone}</td>
+                            <td className="border p-2">{o.from_location}</td>
+                            <td className="border p-2">{o.to_location}</td>
+                            <td className="border p-2">{o.shift_type}</td>
+                            <td className="border p-2">{o.date}</td>
+                            <td className="border p-2 text-center">
+                              {o.status === "Completed" ? (
+                                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                  Completed
+                                </span>
+                              ) : (
+                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">
+                                  Pending
+                                </span>
+                              )}
+                            </td>
+                            <td className="border p-2 text-center">
+                              <div className="flex flex-col lg:flex-row items-center justify-center gap-2">
+                                {o.status !== "Completed" && (
+                                  <button
+                                    onClick={() => handleCompleteOrder(o._id)}
+                                    className="w-full lg:w-auto bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                                  >
+                                    Complete
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteOrder(o._id)}
+                                  className="w-full lg:w-auto bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

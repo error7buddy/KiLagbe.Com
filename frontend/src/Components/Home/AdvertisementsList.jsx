@@ -75,23 +75,25 @@ export default function AdvertisementList() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Search */}
-      <div className="mb-8 relative">
+      <div className="mb-6 sm:mb-8 relative">
         <input
           type="text"
           placeholder="Search by area, district, BHK, or keyword..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="
-            w-full px-5 py-4 text-black bg-white
+            w-full pr-12 pl-4 sm:pl-5
+            py-3 sm:py-4 text-sm sm:text-base
+            text-black bg-white
             border-2 border-black rounded-full shadow-md
             placeholder-gray-500 transition-all duration-300
             focus:outline-none focus:bg-black focus:text-white
             focus:placeholder-gray-400 focus:shadow-xl
           "
         />
-        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-black pointer-events-none">
+        <span className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 text-black pointer-events-none text-base sm:text-lg">
           🔍
         </span>
       </div>
@@ -100,17 +102,17 @@ export default function AdvertisementList() {
       {currentAds.length === 0 ? (
         <p className="text-center text-gray-500">No ads match your search.</p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {currentAds.map((ad) => (
             <div
               key={ad._id}
-              className="border rounded-lg shadow bg-white overflow-hidden"
+              className="border rounded-lg shadow bg-white overflow-hidden flex flex-col"
             >
               {/* ✅ Show Cloudinary image URL */}
               {ad.images?.[0] ? (
                 <img
                   src={ad.images[0]}
-                  className="h-48 w-full object-cover"
+                  className="h-44 sm:h-48 w-full object-cover"
                   alt={ad.title || "ad"}
                   loading="lazy"
                   onError={(e) => {
@@ -119,23 +121,31 @@ export default function AdvertisementList() {
                   }}
                 />
               ) : (
-                <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                <div className="h-44 sm:h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
                   No image
                 </div>
               )}
 
-              <div className="p-4">
-                <h2 className="font-bold text-lg">{ad.title}</h2>
-                <p className="text-sm text-gray-600">
+              <div className="p-4 flex-1">
+                <h2 className="font-bold text-base sm:text-lg break-words">
+                  {ad.title}
+                </h2>
+
+                <p className="text-xs sm:text-sm text-gray-600 break-words">
                   {ad.address?.area || "Unknown Area"},{" "}
                   {ad.address?.district || "Unknown District"}
                 </p>
-                <p className="mt-2">{ad.bhk || "N/A"} BHK</p>
-                <p className="text-sm text-gray-500 mt-2">
+
+                <p className="mt-2 text-sm sm:text-base">
+                  {ad.bhk || "N/A"} BHK
+                </p>
+
+                <p className="text-xs sm:text-sm text-gray-500 mt-2 break-words line-clamp-3">
                   {ad.description || "No description available."}
                 </p>
+
                 {ad.address?.phone && (
-                  <p className="text-sm text-gray-700 mt-2">
+                  <p className="text-xs sm:text-sm text-gray-700 mt-2 break-words">
                     📞 {ad.address.phone}
                   </p>
                 )}
@@ -151,7 +161,7 @@ export default function AdvertisementList() {
           <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 py-1 border rounded disabled:opacity-50"
+            className="px-3 py-2 sm:py-1 border rounded disabled:opacity-50 text-sm"
           >
             Prev
           </button>
@@ -160,7 +170,7 @@ export default function AdvertisementList() {
             <button
               key={num}
               onClick={() => goToPage(num)}
-              className={`px-3 py-1 border rounded ${
+              className={`px-3 py-2 sm:py-1 border rounded text-sm ${
                 num === currentPage ? "bg-black text-white" : ""
               }`}
             >
@@ -171,7 +181,7 @@ export default function AdvertisementList() {
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 border rounded disabled:opacity-50"
+            className="px-3 py-2 sm:py-1 border rounded disabled:opacity-50 text-sm"
           >
             Next
           </button>

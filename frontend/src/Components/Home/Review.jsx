@@ -91,30 +91,33 @@ export default function Review() {
   const visibleReviews = showAll ? reviews : reviews.slice(0, 6);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16 bg-white dark:bg-black min-h-screen transition-colors duration-300">
-      <h2 className="text-4xl font-bold text-center text-black dark:text-white mb-10">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 bg-white dark:bg-black transition-colors duration-300">
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-black dark:text-white mb-8 sm:mb-10">
         🗣️ What Our Users Say
       </h2>
 
       {/* Reviews Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {visibleReviews.map((review) => (
           <div
             key={review.id}
-            className="bg-gray-50 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded-2xl shadow-md p-6 hover:shadow-lg transition-all duration-300"
+            className="bg-gray-50 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded-2xl shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300"
           >
-            <h3 className="text-lg font-semibold text-black dark:text-white mb-1">
-              {review.user}
-            </h3>
-            <p className="text-gray-700 dark:text-gray-400 text-sm mb-1">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-base sm:text-lg font-semibold text-black dark:text-white mb-1 break-words">
+                {review.user}
+              </h3>
+              <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-500 shrink-0">
+                {review.date}
+              </p>
+            </div>
+
+            <p className="text-gray-700 dark:text-gray-400 text-xs sm:text-sm mb-3 break-words">
               Service: <span className="font-medium">{review.service}</span>
-            </p>
-            <p className="text-gray-500 dark:text-gray-500 text-xs mb-3">
-              {review.date}
             </p>
 
             {/* Stars */}
-            <div className="flex items-center mb-3">
+            <div className="flex items-center gap-1 mb-3 flex-wrap">
               {[...Array(5)].map((_, index) => (
                 <Star
                   key={index}
@@ -128,7 +131,7 @@ export default function Review() {
               ))}
             </div>
 
-            <p className="text-gray-800 dark:text-gray-300 text-sm leading-relaxed">
+            <p className="text-gray-800 dark:text-gray-300 text-sm leading-relaxed break-words">
               {review.comment}
             </p>
           </div>
@@ -136,10 +139,10 @@ export default function Review() {
       </div>
 
       {/* Show More / Less Button */}
-      <div className="text-center mt-12">
+      <div className="text-center mt-10 sm:mt-12">
         <button
           onClick={() => setShowAll(!showAll)}
-          className="bg-black dark:bg-white text-white dark:text-black px-6 py-2 rounded-full border border-gray-300 hover:opacity-80 transition-all"
+          className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-full border border-gray-300 hover:opacity-80 transition-all"
         >
           {showAll ? "Show Less" : "Show More"}
         </button>

@@ -117,117 +117,145 @@ const AdFormPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto p-6 bg-white shadow rounded mt-10 mb-10"
-      >
-        <h2 className="text-xl font-bold mb-4">Post Advertisement</h2>
-
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          required
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="bhk"
-          placeholder="BHK"
-          value={formData.bhk}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="houseNo"
-          placeholder="House No"
-          value={formData.houseNo}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="area"
-          placeholder="Area"
-          value={formData.area}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="district"
-          placeholder="District"
-          value={formData.district}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone"
-          value={formData.phone}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-
-        <input
-          type="file"
-          name="images"
-          onChange={handleChange}
-          multiple
-          accept="image/*"
-          className="w-full mb-2 border border-gray-300 rounded-md px-3 py-2"
-        />
-
-        <button
-          type="submit"
-          disabled={uploading}
-          className="w-full bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition disabled:opacity-60"
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-lg mx-auto p-5 sm:p-6 bg-white shadow rounded-lg mt-2 sm:mt-6 mb-8"
         >
-          {uploading ? "Uploading..." : "Post Ad"}
-        </button>
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Post Advertisement</h2>
 
-        <p className="text-xs text-gray-500 mt-3">
-          Images are uploaded to Cloudinary and shown in ad cards automatically.
-        </p>
-      </form>
+          {/* Title */}
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full p-2.5 mb-3 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+          />
 
-      {/* Limit Modal */}
-      {showLimitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
-          <div className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center shadow-lg z-10">
-            <h3 className="text-lg font-bold mb-4">⚠️ Limit Reached</h3>
-            <p className="mb-4">
-              You have reached your free ad limit. Delete an existing ad from your profile to post a new one.
-            </p>
-            <button
-              onClick={() => navigate("/profile")}
-              className="bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
-            >
-              Go to Profile
-            </button>
+          {/* Description */}
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+            rows={4}
+            className="w-full p-2.5 mb-3 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-black/20"
+          />
+
+          {/* Responsive grid for small fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              type="text"
+              name="bhk"
+              placeholder="BHK"
+              value={formData.bhk}
+              onChange={handleChange}
+              className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            />
+
+            <input
+              type="text"
+              name="houseNo"
+              placeholder="House No"
+              value={formData.houseNo}
+              onChange={handleChange}
+              className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            />
+
+            <input
+              type="text"
+              name="area"
+              placeholder="Area"
+              value={formData.area}
+              onChange={handleChange}
+              className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            />
+
+            <input
+              type="text"
+              name="district"
+              placeholder="District"
+              value={formData.district}
+              onChange={handleChange}
+              className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            />
           </div>
-        </div>
-      )}
+
+          {/* Phone */}
+          <input
+            type="text"
+            name="phone"
+            placeholder="Phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full p-2.5 mt-3 mb-3 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+          />
+
+          {/* Images */}
+          <div className="mt-1">
+            <input
+              type="file"
+              name="images"
+              onChange={handleChange}
+              multiple
+              accept="image/*"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              You can upload up to 5 images.
+            </p>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={uploading}
+            className="w-full mt-4 bg-black text-white py-2.5 px-4 rounded hover:bg-white hover:text-black border transition disabled:opacity-60"
+          >
+            {uploading ? "Uploading..." : "Post Ad"}
+          </button>
+
+          <p className="text-xs text-gray-500 mt-3">
+            Images are uploaded to Cloudinary and shown in ad cards automatically.
+          </p>
+        </form>
+
+        {/* Limit Modal */}
+        {showLimitModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+
+            <div className="relative bg-white rounded-lg p-5 sm:p-6 max-w-sm w-full text-center shadow-lg z-10 max-h-[85vh] overflow-auto">
+              <h3 className="text-base sm:text-lg font-bold mb-3">⚠️ Limit Reached</h3>
+
+              <p className="mb-4 text-sm sm:text-base">
+                You have reached your free ad limit. Delete an existing ad from your profile to
+                post a new one.
+              </p>
+
+              <button
+                onClick={() => navigate("/profile")}
+                className="w-full bg-black text-white py-2.5 px-4 rounded hover:bg-white hover:text-black border transition"
+              >
+                Go to Profile
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowLimitModal(false)}
+                className="w-full mt-2 py-2.5 px-4 rounded border hover:bg-gray-50 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

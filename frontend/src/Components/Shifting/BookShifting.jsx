@@ -63,28 +63,79 @@ const BookShifting = () => {
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Book a Shifting Service</h2>
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-lg mx-auto bg-white rounded-lg shadow p-5 sm:p-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">
+          Book a Shifting Service
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input name="name" placeholder="Full Name" value={form.name} onChange={handleChange} className="w-full p-2 border rounded" required />
-        <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} className="w-full p-2 border rounded" required />
-        <input name="from_location" placeholder="From Location" value={form.from_location} onChange={handleChange} className="w-full p-2 border rounded" required />
-        <input name="to_location" placeholder="To Location" value={form.to_location} onChange={handleChange} className="w-full p-2 border rounded" required />
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            required
+          />
 
-        <select name="shift_type" value={form.shift_type} onChange={handleChange} className="w-full p-2 border rounded" required>
-          <option value="">Select Shift Type</option>
-          <option value="Home">Home</option>
-          <option value="Office">Office</option>
-          <option value="Furniture">Furniture</option>
-        </select>
+          <input
+            name="phone"
+            placeholder="Phone"
+            value={form.phone}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            required
+          />
 
-        <input type="date" name="date" value={form.date} onChange={handleChange} className="w-full p-2 border rounded" required />
+          <input
+            name="from_location"
+            placeholder="From Location"
+            value={form.from_location}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            required
+          />
 
-        <button type="submit" className="w-full bg-black text-white p-2 rounded hover:bg-gray-800">
-          Submit Booking
-        </button>
-      </form>
+          <input
+            name="to_location"
+            placeholder="To Location"
+            value={form.to_location}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            required
+          />
+
+          <select
+            name="shift_type"
+            value={form.shift_type}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-black/20"
+            required
+          >
+            <option value="">Select Shift Type</option>
+            <option value="Home">Home</option>
+            <option value="Office">Office</option>
+            <option value="Furniture">Furniture</option>
+          </select>
+
+          <input
+            type="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2.5 rounded hover:bg-gray-800 transition"
+          >
+            Submit Booking
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
