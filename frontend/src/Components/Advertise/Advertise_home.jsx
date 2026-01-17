@@ -3,7 +3,27 @@ import axios from "axios";
 import { auth } from "../../Firebase/config";
 import { useNavigate } from "react-router-dom";
 
+// ✅ API
 const API = import.meta.env.VITE_API_URL;
+
+// ✅ Cloudinary env
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+// ✅ Upload helper
+const uploadToCloudinary = async (file) => {
+  if (!CLOUD_NAME || !UPLOAD_PRESET) {
+    throw new Error("Cloudinary env missing (VITE_CLOUDINARY_*)");
+  }
+
+  const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", UPLOAD_PRESET);
+
+  const res = await axios.post(url, fd);
+  return res.data.secure_url; // ✅ final URL
+};
 
 const AdFormPage = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +38,7 @@ const AdFormPage = () => {
   });
 
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -41,7 +62,15 @@ const AdFormPage = () => {
       if (!user) return alert("Please login first");
       if (!API) return alert("❌ VITE_API_URL missing in env");
 
-      // ✅ Sending JSON only (images not supported on Vercel uploads)
+      setUploading(true);
+
+      // ✅ Upload up to 5 images to Cloudinary
+      const imageUrls =
+        formData.images?.length > 0
+          ? await Promise.all(formData.images.slice(0, 5).map(uploadToCloudinary))
+          : [];
+
+      // ✅ Send to backend (store URLs in MongoDB)
       const payload = {
         userId: user.uid,
         title: formData.title,
@@ -51,7 +80,7 @@ const AdFormPage = () => {
         area: formData.area,
         district: formData.district,
         phone: formData.phone,
-        images: [], // store Cloudinary/Firebase URLs later
+        images: imageUrls, // ✅ URLs saved
       };
 
       const res = await axios.post(`${API}/api/ads`, payload, {
@@ -70,16 +99,20 @@ const AdFormPage = () => {
           phone: "",
           images: [],
         });
-        navigate("/profile"); // ✅ go to profile after posting
+        navigate("/profile");
       } else {
         alert(res.data.message || "❌ Failed to post ad");
       }
     } catch (err) {
+      console.error("Post ad error:", err?.response?.data || err.message);
+
       if (err.response?.status === 403) {
         setShowLimitModal(true);
       } else {
-        alert(err.response?.data?.message || "Error posting ad");
+        alert(err?.response?.data?.message || err.message || "Error posting ad");
       }
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -155,24 +188,25 @@ const AdFormPage = () => {
           className="w-full p-2 mb-2 border rounded"
         />
 
-        {/* keep input if you want, but it won't upload to Vercel storage */}
         <input
           type="file"
           name="images"
           onChange={handleChange}
           multiple
+          accept="image/*"
           className="w-full mb-2 border border-gray-300 rounded-md px-3 py-2"
         />
 
         <button
           type="submit"
-          className="w-full bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
+          disabled={uploading}
+          className="w-full bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition disabled:opacity-60"
         >
-          Post Ad
+          {uploading ? "Uploading..." : "Post Ad"}
         </button>
 
         <p className="text-xs text-gray-500 mt-3">
-          Note: Images won’t upload on Vercel unless you use Cloudinary/Firebase Storage.
+          Images are uploaded to Cloudinary and shown in ad cards automatically.
         </p>
       </form>
 

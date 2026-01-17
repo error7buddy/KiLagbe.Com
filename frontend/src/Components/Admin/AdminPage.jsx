@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const isUrl = (s) => typeof s === "string" && /^https?:\/\//i.test(s);
+
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState("ads");
   const [ads, setAds] = useState([]);
@@ -96,7 +98,9 @@ const AdminPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 relative">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">🛠 Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+        🛠 Admin Dashboard
+      </h1>
 
       <button
         onClick={() => {
@@ -112,7 +116,9 @@ const AdminPage = () => {
         <button
           onClick={() => setActiveTab("ads")}
           className={`px-8 py-3 text-lg font-semibold transition ${
-            activeTab === "ads" ? "bg-blue-600 text-white rounded-l-xl" : "bg-white text-gray-700 border"
+            activeTab === "ads"
+              ? "bg-blue-600 text-white rounded-l-xl"
+              : "bg-white text-gray-700 border"
           }`}
         >
           Manage Ads
@@ -120,7 +126,9 @@ const AdminPage = () => {
         <button
           onClick={() => setActiveTab("shifting")}
           className={`px-8 py-3 text-lg font-semibold transition ${
-            activeTab === "shifting" ? "bg-blue-600 text-white rounded-r-xl" : "bg-white text-gray-700 border"
+            activeTab === "shifting"
+              ? "bg-blue-600 text-white rounded-r-xl"
+              : "bg-white text-gray-700 border"
           }`}
         >
           Manage Shifting
@@ -130,36 +138,61 @@ const AdminPage = () => {
       <div className="bg-white shadow-md rounded-xl p-6">
         {activeTab === "ads" && (
           <div>
-            <h2 className="text-2xl font-semibold mb-6 text-blue-700">🏠 Advertisements</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-blue-700">
+              🏠 Advertisements
+            </h2>
+
             {ads.length === 0 ? (
               <p className="text-gray-600 text-center">No advertisements found.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {ads.map((ad) => (
-                  <div key={ad._id} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition">
-                    <h3 className="text-lg font-bold mb-1">{ad.title || "No Title"}</h3>
-                    <p className="text-sm text-gray-600 mb-1 line-clamp-2">
-                      {ad.description || "No description"}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-1">
-                      📍 {ad.address?.area || "Unknown Area"}, {ad.address?.district || "Unknown District"}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">📞 {ad.address?.phone || "N/A"}</p>
+                {ads.map((ad) => {
+                  const img = ad.images?.[0];
+                  const showImg = isUrl(img);
 
-                    {ad.images?.length > 0 && (
-                      <p className="text-xs text-gray-500 mb-2">
-                        Images won’t show on Vercel unless you use Cloudinary/Firebase.
-                      </p>
-                    )}
-
-                    <button
-                      onClick={() => handleDeleteAd(ad._id)}
-                      className="mt-2 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+                  return (
+                    <div
+                      key={ad._id}
+                      className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
                     >
-                      Delete Ad
-                    </button>
-                  </div>
-                ))}
+                      <h3 className="text-lg font-bold mb-1">{ad.title || "No Title"}</h3>
+                      <p className="text-sm text-gray-600 mb-1 line-clamp-2">
+                        {ad.description || "No description"}
+                      </p>
+                      <p className="text-sm text-gray-500 mb-1">
+                        📍 {ad.address?.area || "Unknown Area"},{" "}
+                        {ad.address?.district || "Unknown District"}
+                      </p>
+                      <p className="text-sm text-gray-500 mb-2">
+                        📞 {ad.address?.phone || "N/A"}
+                      </p>
+
+                      {/* ✅ Cloudinary Image */}
+                      {showImg ? (
+                        <img
+                          src={img}
+                          alt={ad.title || "Ad"}
+                          className="w-full h-40 object-cover rounded mb-3"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-xs text-gray-500">
+                          No image
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => handleDeleteAd(ad._id)}
+                        className="mt-2 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+                      >
+                        Delete Ad
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -167,7 +200,10 @@ const AdminPage = () => {
 
         {activeTab === "shifting" && (
           <div>
-            <h2 className="text-2xl font-semibold mb-6 text-blue-700">🚚 Shifting Orders</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-blue-700">
+              🚚 Shifting Orders
+            </h2>
+
             {orders.length === 0 ? (
               <p className="text-gray-600 text-center">No shifting orders found.</p>
             ) : (
@@ -185,6 +221,7 @@ const AdminPage = () => {
                       <th className="border p-2">Action</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {orders.map((o) => (
                       <tr key={o._id} className="hover:bg-gray-50">
@@ -224,6 +261,7 @@ const AdminPage = () => {
                       </tr>
                     ))}
                   </tbody>
+
                 </table>
               </div>
             )}

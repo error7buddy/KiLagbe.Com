@@ -6,6 +6,8 @@ import { onAuthStateChanged } from "firebase/auth";
 
 const API = import.meta.env.VITE_API_URL;
 
+const isUrl = (s) => typeof s === "string" && /^https?:\/\//i.test(s);
+
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [ads, setAds] = useState([]);
@@ -21,7 +23,7 @@ const Profile = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  // ✅ Fetch ads for this user (backend supports ?userId=)
+  // ✅ Fetch ads for this user
   const fetchUserAds = async (uid) => {
     try {
       if (!API) {
@@ -31,10 +33,8 @@ const Profile = () => {
       }
 
       setLoadingAds(true);
-
       const res = await fetch(`${API}/api/ads?userId=${encodeURIComponent(uid)}`);
       const data = await res.json();
-
       setAds(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching user ads:", err);
@@ -48,7 +48,7 @@ const Profile = () => {
     if (user?.uid) fetchUserAds(user.uid);
   }, [user]);
 
-  // ✅ Delete ad (backend expects ?id=)
+  // ✅ Delete ad (backend expects ?id=) — no headers to avoid preflight issues
   const handleDeleteAd = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this ad?")) return;
 
@@ -56,23 +56,8 @@ const Profile = () => {
       if (!API) return alert("❌ VITE_API_URL missing in env");
 
       const url = `${API}/api/ads?id=${encodeURIComponent(_id)}`;
-      console.log("DELETE URL:", url);
-
-      const res = await fetch(url, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const text = await res.text(); // raw response for debugging
-      console.log("DELETE STATUS:", res.status);
-      console.log("DELETE RESPONSE:", text);
-
-      let data = {};
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = {};
-      }
+      const res = await fetch(url, { method: "DELETE" });
+      const data = await res.json();
 
       if (res.ok && data.success) {
         setAds((prev) => prev.filter((ad) => ad._id !== _id));
@@ -82,11 +67,11 @@ const Profile = () => {
       }
     } catch (err) {
       console.error("Delete error:", err);
-      alert("❌ Error deleting ad (check console/network)");
+      alert("❌ Error deleting ad");
     }
   };
 
-  // ✅ Edit ad (your route)
+  // ✅ Edit ad
   const handleEditAd = (_id) => {
     navigate(`/edit-ad/${_id}`);
   };
@@ -96,7 +81,6 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-6xl mx-auto px-4 space-y-10">
-
         {/* ===== Profile Card ===== */}
         <div className="bg-white rounded-xl shadow-md p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6">
           <img
@@ -126,48 +110,62 @@ const Profile = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ads.map((ad) => (
-                <div
-                  key={ad._id}
-                  className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col"
-                >
-                  <h3 className="text-lg font-bold mb-1">{ad.title}</h3>
+              {ads.map((ad) => {
+                const img = ad.images?.[0];
+                const showImg = isUrl(img); // ✅ show only if URL (Cloudinary)
 
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                    {ad.description}
-                  </p>
+                return (
+                  <div
+                    key={ad._id}
+                    className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col"
+                  >
+                    <h3 className="text-lg font-bold mb-1">{ad.title}</h3>
 
-                  <p className="text-sm text-gray-500 mb-3">
-                    📍 {ad.address?.area}, {ad.address?.district}
-                  </p>
+                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      {ad.description}
+                    </p>
 
-                  {/* ⚠️ Vercel can't serve /uploads */}
-                  {ad.images?.[0] && (
-                    <div className="w-full h-40 object-cover rounded-lg mb-4 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
-                      Image requires Cloudinary / Firebase Storage
+                    <p className="text-sm text-gray-500 mb-3">
+                      📍 {ad.address?.area}, {ad.address?.district}
+                    </p>
+
+                    {/* ✅ Cloudinary Image */}
+                    {showImg ? (
+                      <img
+                        src={img}
+                        alt="ad"
+                        className="w-full h-40 object-cover rounded-lg mb-4"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-40 rounded-lg mb-4 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                        No image
+                      </div>
+                    )}
+
+                    <div className="mt-auto flex gap-2">
+                      <button
+                        onClick={() => handleEditAd(ad._id)}
+                        className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAd(ad._id)}
+                        className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
+                      >
+                        Delete
+                      </button>
                     </div>
-                  )}
-
-                  <div className="mt-auto flex gap-2">
-                    <button
-                      onClick={() => handleEditAd(ad._id)}
-                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteAd(ad._id)}
-                      className="flex-1 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black border transition"
-                    >
-                      Delete
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

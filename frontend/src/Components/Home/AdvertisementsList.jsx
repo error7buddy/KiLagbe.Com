@@ -102,23 +102,42 @@ export default function AdvertisementList() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentAds.map((ad) => (
-            <div key={ad._id} className="border rounded-lg shadow bg-white overflow-hidden">
-              {/* ⚠️ Vercel can't serve /uploads */}
-              <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-                {ad.images?.length ? "Image not available on Vercel" : "No image"}
-              </div>
+            <div
+              key={ad._id}
+              className="border rounded-lg shadow bg-white overflow-hidden"
+            >
+              {/* ✅ Show Cloudinary image URL */}
+              {ad.images?.[0] ? (
+                <img
+                  src={ad.images[0]}
+                  className="h-48 w-full object-cover"
+                  alt={ad.title || "ad"}
+                  loading="lazy"
+                  onError={(e) => {
+                    // fallback if image URL invalid
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                  No image
+                </div>
+              )}
 
               <div className="p-4">
                 <h2 className="font-bold text-lg">{ad.title}</h2>
                 <p className="text-sm text-gray-600">
-                  {ad.address?.area || "Unknown Area"}, {ad.address?.district || "Unknown District"}
+                  {ad.address?.area || "Unknown Area"},{" "}
+                  {ad.address?.district || "Unknown District"}
                 </p>
                 <p className="mt-2">{ad.bhk || "N/A"} BHK</p>
                 <p className="text-sm text-gray-500 mt-2">
                   {ad.description || "No description available."}
                 </p>
                 {ad.address?.phone && (
-                  <p className="text-sm text-gray-700 mt-2">📞 {ad.address.phone}</p>
+                  <p className="text-sm text-gray-700 mt-2">
+                    📞 {ad.address.phone}
+                  </p>
                 )}
               </div>
             </div>
@@ -141,7 +160,9 @@ export default function AdvertisementList() {
             <button
               key={num}
               onClick={() => goToPage(num)}
-              className={`px-3 py-1 border rounded ${num === currentPage ? "bg-black text-white" : ""}`}
+              className={`px-3 py-1 border rounded ${
+                num === currentPage ? "bg-black text-white" : ""
+              }`}
             >
               {num}
             </button>
