@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../Firebase/config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-
+import { DEFAULT_PROFILE_IMAGE } from "./defaultProfile";
 const Navbar = () => {
   const [user, setUser] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false); // ✅ mobile toggle
+  const [menuOpen, setMenuOpen] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
-  // ✅ close mobile menu on route change actions
+  // close mobile menu on route change actions
   const go = (path) => {
     setMenuOpen(false);
     navigate(path);
@@ -72,11 +72,14 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-4">
               {user ? (
                 <>
-                  <img
-                    src={user.photoURL || "https://i.ibb.co.com/sJjJnc3T/image.png"}
+                 <img
+                    src={user?.photoURL || DEFAULT_PROFILE_IMAGE}
                     alt="Profile"
-                    className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300 object-cover"
-                    onClick={() => go("/profile")}
+                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-300 cursor-pointer"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_PROFILE_IMAGE;
+                    }}
+                    onClick={() => navigate("/profile")}
                   />
 
                   <button

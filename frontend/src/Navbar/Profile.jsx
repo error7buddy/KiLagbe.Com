@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
+import { DEFAULT_PROFILE_IMAGE } from "./defaultProfile";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -95,10 +96,14 @@ const Profile = () => {
         {/* ===== Profile Card ===== */}
         <div className="bg-white rounded-xl shadow-md p-5 sm:p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
           <img
-            src={user.photoURL || "https://i.ibb.co.com/sJjJnc3T/image.png"}
+            src={user?.photoURL || DEFAULT_PROFILE_IMAGE}
             alt="Profile"
-            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-gray-300 object-cover"
+            className="w-28 h-28 rounded-full object-cover border-2 border-gray-300"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PROFILE_IMAGE;
+            }}
           />
+
 
           <div className="text-center sm:text-left min-w-0">
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">My Profile</h1>

@@ -1,3 +1,4 @@
+// src/Navbar/AuthForm.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../Firebase/config";
@@ -6,6 +7,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 const DEFAULT_PROFILE_PIC = "https://ibb.co.com/PvbypHyq"; // ✅ default profile picture
@@ -51,6 +54,28 @@ const AuthForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ Google Login
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+      // Optional: ensure photoURL exists
+      if (result.user && !result.user.photoURL) {
+        await updateProfile(result.user, { photoURL: DEFAULT_PROFILE_PIC });
+      }
+
+      alert("✅ Logged in with Google!");
+      navigate("/home");
+    } catch (error) {
+      setErrors({ submit: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -81,13 +106,13 @@ const AuthForm = () => {
 
         const user = userCredential.user;
 
-        // ✅ Set default profile picture
+        // Set default profile picture
         await updateProfile(user, { photoURL: DEFAULT_PROFILE_PIC });
 
-        // ✅ IMPORTANT FIX: logout after registration
+        //logout after registration
         await signOut(auth);
 
-        // ✅ Redirect to login
+        // Redirect to login
         alert("🎉 Registration successful! Please log in.");
         setIsLogin(true);
         setFormData({ email: "", password: "", confirmPassword: "" });
@@ -183,12 +208,30 @@ const AuthForm = () => {
             </button>
           </form>
 
+        <button
+  type="button"
+  onClick={handleGoogleLogin}
+  disabled={loading}
+  className="w-full mt-3 py-2.5 px-4 border rounded-md
+             flex items-center justify-center gap-3
+             hover:bg-gray-50 transition disabled:opacity-50"
+>
+  <img
+    src="https://developers.google.com/identity/images/g-logo.png"
+    alt="Google"
+    className="w-5 h-5"
+  />
+  <span className="font-medium text-gray-700">
+    Continue with Google
+  </span>
+</button>
+
           <p className="text-center text-sm mt-4">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-500 font-medium"
+              className="text-blue-600 hover:text-black font-medium"
             >
               {isLogin ? "Sign Up" : "Sign In"}
             </button>
