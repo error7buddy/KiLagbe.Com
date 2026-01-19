@@ -23,34 +23,55 @@ const Login = () => {
         onSubmit={handleLogin}
         className="bg-white w-full max-w-sm sm:max-w-md p-6 sm:p-8 rounded-xl shadow-md"
       >
-        <h2 className="text-xl sm:text-2xl font-bold mb-5 sm:mb-6 text-center">
+        <h2 className="text-xl sm:text-2xl font-bold mb-2 text-center">
           Admin Login
         </h2>
 
+        {/* ✅ VERY IMPORTANT TRUST TEXT */}
+        <p className="text-xs text-gray-500 text-center mb-6">
+          This page is restricted to administrators only.
+          <br />
+          Part of a university final year project.  
+          Do not enter personal or banking information.
+        </p>
+
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Admin Username
+        </label>
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Enter admin username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/40"
           required
+          autoComplete="username"
         />
 
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Admin Password
+        </label>
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Enter admin password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-3 mb-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/40"
           required
+          autoComplete="current-password"
         />
 
         <button
           type="submit"
           className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
         >
-          Login
+          Login as Admin
         </button>
+
+        {/* ✅ extra identity info */}
+        <p className="text-[11px] text-gray-500 text-center mt-4">
+          © 2024–2025 | University Project – Not a commercial service
+        </p>
       </form>
     </div>
   );

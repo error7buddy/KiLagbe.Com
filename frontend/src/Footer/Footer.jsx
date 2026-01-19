@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -10,16 +11,38 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li><a href="#" className="hover:text-gray-900">About us</a></li>
+              <li>
+                <Link to="/about" className="hover:text-gray-900">
+                  About us
+                </Link>
+              </li>
+
+              {/* Keep these as placeholders if you don’t have pages */}
               <li><a href="#" className="hover:text-gray-900">Careers</a></li>
               <li><a href="#" className="hover:text-gray-900">Accessibility</a></li>
               <li><a href="#" className="hover:text-gray-900">Feedback</a></li>
               <li><a href="#" className="hover:text-gray-900">Media room</a></li>
               <li><a href="#" className="hover:text-gray-900">Ad Choices</a></li>
-              <li><a href="#" className="hover:text-gray-900">Advertise with us</a></li>
+
+              <li>
+                <Link to="/advertise" className="hover:text-gray-900">
+                  Advertise with us
+                </Link>
+              </li>
+
               <li><a href="#" className="hover:text-gray-900">Agent support</a></li>
-              <li><a href="#" className="hover:text-gray-900">Privacy</a></li>
-              <li><a href="#" className="hover:text-gray-900">Terms</a></li>
+
+              {/* ✅ Real pages */}
+              <li>
+                <Link to="/privacy" className="hover:text-gray-900 font-medium">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="hover:text-gray-900 font-medium">
+                  Terms & Conditions
+                </Link>
+              </li>
             </ul>
           </div>
 

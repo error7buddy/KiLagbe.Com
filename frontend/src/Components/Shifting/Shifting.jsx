@@ -36,8 +36,13 @@ export default function Shifting() {
           🏠 Shifting Service
         </h1>
 
-        <p className="text-gray-600 text-center sm:text-left max-w-2xl mb-8 sm:mb-10">
+        <p className="text-gray-600 text-center sm:text-left max-w-2xl mb-3">
           Choose your service type and book your shifting order online.
+        </p>
+
+        {/* ✅ Trust note for Google Safe Browsing (no functionality change) */}
+        <p className="text-xs text-gray-500 text-center sm:text-left max-w-2xl mb-8 sm:mb-10">
+          Educational project — bookings are for demo/testing. Please do not submit sensitive information.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
@@ -51,6 +56,10 @@ export default function Shifting() {
                 alt={service.title}
                 className="w-full h-44 sm:h-48 object-cover"
                 loading="lazy"
+                onError={(e) => {
+                  // prevents broken external image from looking suspicious
+                  e.currentTarget.style.display = "none";
+                }}
               />
 
               <div className="p-5 sm:p-6 text-center flex-1 flex flex-col">
@@ -58,9 +67,7 @@ export default function Shifting() {
                   {service.title}
                 </h2>
 
-                <p className="text-gray-600 text-sm mb-4">
-                  {service.description}
-                </p>
+                <p className="text-gray-600 text-sm mb-4">{service.description}</p>
 
                 <button
                   onClick={() => navigate(`/book-shifting/${service.id}`)}

@@ -18,6 +18,10 @@ import { auth } from "./Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import Profile from "./Navbar/Profile";
 
+// ✅ NEW imports
+import PrivacyPolicy from "./Pages/PrivacyPolicy";
+import Terms from "./Pages/Terms";
+
 // Protected route for authenticated users
 const ProtectedRoute = ({ children }) => {
   const [user, setUser] = React.useState(null);
@@ -45,6 +49,11 @@ const router = createBrowserRouter([
       { index: true, element: <Navigate to="/home" replace /> },
       { path: "home", element: <Home /> },
       { path: "about", element: <About /> },
+
+      // ✅ NEW routes (public)
+      { path: "privacy", element: <PrivacyPolicy /> },
+      { path: "terms", element: <Terms /> },
+
       {
         path: "advertise",
         element: (

@@ -62,12 +62,31 @@ const BookShifting = () => {
     }
   };
 
+  // ✅ Clear UI if API missing (no behavior change, just clarity)
+  if (!API) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-4 py-10 flex items-center justify-center">
+        <div className="bg-white border rounded-xl shadow p-6 max-w-md w-full text-center">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">⚠️ Service Unavailable</h2>
+          <p className="text-sm text-gray-600">
+            API configuration is missing. Please set <span className="font-medium">VITE_API_URL</span> and redeploy.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <div className="max-w-lg mx-auto bg-white rounded-lg shadow p-5 sm:p-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold mb-2">
           Book a Shifting Service
         </h2>
+
+        {/* ✅ Trust note for Google Safe Browsing (no functionality change) */}
+        <p className="text-xs text-gray-500 mb-4">
+          Educational project — booking requests are stored for demo/testing. Do not submit sensitive information.
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input

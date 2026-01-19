@@ -15,6 +15,15 @@ const Profile = () => {
   const [loadingAds, setLoadingAds] = useState(true);
   const navigate = useNavigate();
 
+  const safeJson = async (res) => {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return [];
+    }
+  };
+
   // ✅ Check auth and set user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -35,7 +44,7 @@ const Profile = () => {
 
       setLoadingAds(true);
       const res = await fetch(`${API}/api/ads?userId=${encodeURIComponent(uid)}`);
-      const data = await res.json();
+      const data = await safeJson(res);
       setAds(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching user ads:", err);
@@ -47,9 +56,10 @@ const Profile = () => {
 
   useEffect(() => {
     if (user?.uid) fetchUserAds(user.uid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // ✅ Delete ad (backend expects ?id=) — no headers to avoid preflight issues
+  // ✅ Delete ad (backend expects ?id=)
   const handleDeleteAd = async (_id) => {
     if (!window.confirm("Are you sure you want to delete this ad?")) return;
 
@@ -57,15 +67,9 @@ const Profile = () => {
       if (!API) return alert("❌ VITE_API_URL missing");
 
       const url = `${API}/api/ads?id=${encodeURIComponent(_id)}`;
-      console.log("DELETE URL:", url);
-
-      // ✅ no headers -> avoids OPTIONS preflight issues
       const res = await fetch(url, { method: "DELETE" });
 
       const text = await res.text();
-      console.log("DELETE STATUS:", res.status);
-      console.log("DELETE RAW:", text);
-
       let data = {};
       try {
         data = JSON.parse(text);
@@ -104,12 +108,16 @@ const Profile = () => {
             }}
           />
 
-
           <div className="text-center sm:text-left min-w-0">
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">My Profile</h1>
             <p className="text-sm sm:text-lg font-semibold break-words">{user.email}</p>
             <p className="text-xs sm:text-sm text-gray-500 break-all mt-1">
               UID: {user.uid}
+            </p>
+
+            {/* Optional trust note */}
+            <p className="text-[11px] text-gray-500 mt-2">
+              Educational project — please do not share sensitive information.
             </p>
           </div>
         </div>
@@ -130,7 +138,7 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {ads.map((ad) => {
                 const img = ad.images?.[0];
-                const showImg = isUrl(img); // ✅ show only if URL (Cloudinary)
+                const showImg = isUrl(img);
 
                 return (
                   <div
@@ -149,7 +157,6 @@ const Profile = () => {
                       📍 {ad.address?.area}, {ad.address?.district}
                     </p>
 
-                    {/* ✅ Cloudinary Image */}
                     {showImg ? (
                       <img
                         src={img}

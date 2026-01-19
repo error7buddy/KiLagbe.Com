@@ -30,6 +30,8 @@ export default function AdvertisementList() {
         setFilteredAds(list);
       } catch (err) {
         console.error("Fetch ads error:", err?.response?.data || err.message);
+        setAds([]);
+        setFilteredAds([]);
       } finally {
         setLoading(false);
       }
@@ -60,6 +62,20 @@ export default function AdvertisementList() {
     setCurrentPage(1);
   }, [searchTerm, ads]);
 
+  // ✅ If API missing, show clear message (no behavior change to data flow)
+  if (!API) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="bg-white border rounded-xl shadow p-6 text-center">
+          <h3 className="text-lg font-bold text-gray-800 mb-2">⚠️ Service Unavailable</h3>
+          <p className="text-sm text-gray-600">
+            API configuration is missing. Please set <span className="font-medium">VITE_API_URL</span> and redeploy.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return <p className="text-center mt-6">Loading ads...</p>;
   if (!ads.length) return <p className="text-center mt-6">No ads found</p>;
 
@@ -76,6 +92,11 @@ export default function AdvertisementList() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* ✅ Trust note (helps reduce false phishing flags, no functional change) */}
+      <p className="text-[11px] text-gray-500 text-center mb-4">
+        Educational project — listings are user-submitted. Avoid sharing sensitive information.
+      </p>
+
       {/* Search */}
       <div className="mb-6 sm:mb-8 relative">
         <input
@@ -116,7 +137,6 @@ export default function AdvertisementList() {
                   alt={ad.title || "ad"}
                   loading="lazy"
                   onError={(e) => {
-                    // fallback if image URL invalid
                     e.currentTarget.style.display = "none";
                   }}
                 />

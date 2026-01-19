@@ -16,23 +16,34 @@ const AdminPage = () => {
     if (!isAdmin) navigate("/login");
   }, [navigate]);
 
+  const safeJson = async (res) => {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { success: false, message: text || "Invalid server response" };
+    }
+  };
+
   const fetchAds = async () => {
     try {
       const res = await fetch(`${API}/api/ads`);
-      const data = await res.json();
+      const data = await safeJson(res);
       setAds(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching ads:", error);
+      setAds([]);
     }
   };
 
   const fetchOrders = async () => {
     try {
       const res = await fetch(`${API}/api/shifting-orders`);
-      const data = await res.json();
+      const data = await safeJson(res);
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setOrders([]);
     }
   };
 
@@ -46,8 +57,9 @@ const AdminPage = () => {
     if (!window.confirm("Delete this ad permanently?")) return;
     try {
       const res = await fetch(`${API}/api/ads?id=${_id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.success) {
+      const data = await safeJson(res);
+
+      if (res.ok && data.success) {
         setAds((prev) => prev.filter((ad) => ad._id !== _id));
         alert("✅ Ad deleted!");
       } else {
@@ -62,9 +74,12 @@ const AdminPage = () => {
   const handleDeleteOrder = async (_id) => {
     if (!window.confirm("Delete this shifting order permanently?")) return;
     try {
-      const res = await fetch(`${API}/api/shifting-orders?id=${_id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.success) {
+      const res = await fetch(`${API}/api/shifting-orders?id=${_id}`, {
+        method: "DELETE",
+      });
+      const data = await safeJson(res);
+
+      if (res.ok && data.success) {
         setOrders((prev) => prev.filter((o) => o._id !== _id));
         alert("✅ Order deleted!");
       } else {
@@ -78,11 +93,13 @@ const AdminPage = () => {
 
   const handleCompleteOrder = async (_id) => {
     try {
-      const res = await fetch(`${API}/api/shifting-orders?id=${_id}&action=complete`, {
-        method: "PUT",
-      });
-      const data = await res.json();
-      if (data.success) {
+      const res = await fetch(
+        `${API}/api/shifting-orders?id=${_id}&action=complete`,
+        { method: "PUT" }
+      );
+      const data = await safeJson(res);
+
+      if (res.ok && data.success) {
         setOrders((prev) =>
           prev.map((o) => (o._id === _id ? { ...o, status: "Completed" } : o))
         );
@@ -95,6 +112,20 @@ const AdminPage = () => {
       alert("❌ Error completing order");
     }
   };
+
+  // ✅ If API missing, show a message instead of broken fetch calls
+  if (!API) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+        <div className="bg-white border rounded-xl shadow p-6 max-w-md w-full text-center">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">⚠️ API Not Configured</h2>
+          <p className="text-gray-600 text-sm">
+            VITE_API_URL is missing. Please set it in your environment variables and redeploy.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -180,7 +211,6 @@ const AdminPage = () => {
                           📞 {ad.address?.phone || "N/A"}
                         </p>
 
-                        {/* ✅ Cloudinary Image */}
                         {showImg ? (
                           <img
                             src={img}
@@ -221,7 +251,7 @@ const AdminPage = () => {
                 <p className="text-gray-600 text-center">No shifting orders found.</p>
               ) : (
                 <>
-                  {/* Mobile Cards (sm and below) */}
+                  {/* Mobile Cards */}
                   <div className="grid grid-cols-1 gap-4 sm:hidden">
                     {orders.map((o) => (
                       <div key={o._id} className="border rounded-lg p-4 bg-white shadow-sm">
@@ -281,7 +311,7 @@ const AdminPage = () => {
                     ))}
                   </div>
 
-                  {/* Table (sm and up) */}
+                  {/* Table */}
                   <div className="hidden sm:block overflow-x-auto">
                     <table className="min-w-full border border-gray-200 text-sm">
                       <thead className="bg-gray-100 text-gray-700">

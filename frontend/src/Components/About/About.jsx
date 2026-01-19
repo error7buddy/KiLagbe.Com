@@ -1,4 +1,5 @@
 import React from "react";
+import aboutImg from "./image.png";
 
 const About = () => {
   return (
@@ -6,12 +7,13 @@ const About = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center">
         {/* Left Side - Image */}
         <div className="relative">
+
+
           <img
-            src="src/Components/About/image.png"
+            src={aboutImg}
             alt="About Us"
             className="rounded-2xl shadow-lg object-cover w-full h-64 sm:h-80 md:h-[400px]"
           />
-
           {/* Badge */}
           <div className="absolute left-3 right-3 sm:left-4 sm:right-auto -bottom-4 sm:-bottom-5 bg-gray-800 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-md w-fit max-w-[calc(100%-1.5rem)] sm:max-w-none">
             <h3 className="text-sm sm:text-base md:text-lg font-semibold whitespace-normal">

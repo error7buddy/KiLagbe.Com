@@ -3,54 +3,54 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-// ✅ Example payment method data
+// ✅ Example payment method data (demo)
 const paymentMethods = [
   {
     id: 1,
     name: "Visa",
-    description: "Pay securely with your Visa credit or debit card.",
+    description: "Demo payment option (no real transactions).",
     logo: "https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png",
   },
   {
     id: 2,
     name: "Mastercard",
-    description: "Use your Mastercard for fast and safe payments.",
+    description: "Demo payment option (no real transactions).",
     logo: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
   },
   {
     id: 3,
     name: "PayPal",
-    description: "Checkout quickly using your PayPal account.",
+    description: "Demo payment option (no real transactions).",
     logo: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg",
   },
   {
     id: 4,
     name: "Google Pay",
-    description: "Pay easily via Google Pay on supported devices.",
+    description: "Demo payment option (no real transactions).",
     logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/960px-Google_Pay_Logo.svg.png?20221017164555",
   },
   {
     id: 5,
     name: "Apple Pay",
-    description: "Use Apple Pay for quick and secure mobile payments.",
+    description: "Demo payment option (no real transactions).",
     logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
   },
   {
     id: 6,
     name: "bKash",
-    description: "Pay easily using your bKash mobile wallet.",
+    description: "Demo payment option for this university project.",
     logo: "/logos/1656227518bkash-logo-png.png",
   },
   {
     id: 7,
     name: "Nagad",
-    description: "Fast and secure payments via Nagad account.",
+    description: "Demo payment option for this university project.",
     logo: "/logos/Nagad_Logo_horizontally_og.png",
   },
   {
     id: 8,
     name: "Rocket",
-    description: "Pay with Rocket (Dutch-Bangla Mobile Banking).",
+    description: "Demo payment option for this university project.",
     logo: "/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
   },
 ];
@@ -64,24 +64,23 @@ export default function PaymentMethodsCarousel() {
     slidesToScroll: 1,
     arrows: true,
     autoplay: true,
-    autoplaySpeed: 2500, // ✅ still autoplay, but readable on mobile
+    autoplaySpeed: 2500,
     responsive: [
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: 2 },
-      },
-      {
-        breakpoint: 640,
-        settings: { slidesToShow: 1, arrows: false }, // nicer on phones
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1, arrows: false } },
     ],
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 bg-gradient-to-b from-gray-50 to-white rounded-2xl">
-      <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-gray-800 mb-8 sm:mb-10">
-        💳 Choose Your Payment Method
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-gray-800 mb-3">
+        💳 Payment Methods (Demo)
       </h2>
+
+      {/* ✅ Trust / Anti-phishing disclaimer (no functionality change) */}
+      <p className="text-xs text-gray-600 text-center mb-8 sm:mb-10">
+        Educational project — this section is a demo. No real payments are processed.
+      </p>
 
       <Slider {...settings}>
         {paymentMethods.map((method) => (
@@ -93,6 +92,9 @@ export default function PaymentMethodsCarousel() {
                   alt={method.name}
                   className="object-contain max-h-16 sm:max-h-20"
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
               </div>
 
@@ -104,15 +106,15 @@ export default function PaymentMethodsCarousel() {
                 {method.description}
               </p>
 
+              {/* ✅ Button text adjusted to avoid “real payment” wording */}
               <button className="mt-5 sm:mt-6 w-full bg-black text-white py-2.5 rounded-lg hover:bg-white hover:text-black border border-black transition">
-                Use {method.name}
+                Select {method.name}
               </button>
             </div>
           </div>
         ))}
       </Slider>
 
-      {/* Spacer for next section (responsive instead of <br />) */}
       <div className="h-8 sm:h-12 lg:h-16" />
     </div>
   );

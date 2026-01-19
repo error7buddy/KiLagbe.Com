@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../Firebase/config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { DEFAULT_PROFILE_IMAGE } from "./defaultProfile";
+
 const Navbar = () => {
   const [user, setUser] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false); 
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +16,6 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
-  // close mobile menu on route change actions
   const go = (path) => {
     setMenuOpen(false);
     navigate(path);
@@ -31,7 +31,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Left side - Logo and Navigation Links */}
+          {/* Left side */}
           <div className="flex items-center gap-4 sm:gap-8 min-w-0">
             <div className="flex-shrink-0 text-xl sm:text-2xl font-bold text-gray-900 truncate">
               <Link to="/" onClick={() => setMenuOpen(false)}>
@@ -39,7 +39,7 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop links */}
             <div className="hidden md:flex space-x-6">
               <Link to="/" className="text-gray-700 hover:text-gray-900 font-medium">
                 Home
@@ -47,18 +47,14 @@ const Navbar = () => {
               <Link to="/about" className="text-gray-700 hover:text-gray-900 font-medium">
                 About
               </Link>
-              <Link
-                to="/advertise"
-                className="text-gray-700 hover:text-gray-900 font-medium"
-              >
+              <Link to="/advertise" className="text-gray-700 hover:text-gray-900 font-medium">
                 Advertise
               </Link>
             </div>
           </div>
 
-          {/* Right side - User / Login */}
+          {/* Right side */}
           <div className="flex items-center gap-3 sm:gap-6">
-            {/* Desktop Shifting */}
             <div className="hidden md:flex">
               <Link
                 to="/shifting"
@@ -68,11 +64,11 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Desktop auth actions */}
+            {/* Desktop auth */}
             <div className="hidden md:flex items-center gap-4">
               {user ? (
                 <>
-                 <img
+                  <img
                     src={user?.photoURL || DEFAULT_PROFILE_IMAGE}
                     alt="Profile"
                     className="w-10 h-10 rounded-full object-cover border-2 border-gray-300 cursor-pointer"
@@ -120,7 +116,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu (collapsible) */}
+      {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t bg-white">
           <div className="px-4 py-3 space-y-1">
@@ -157,10 +153,13 @@ const Navbar = () => {
               {user ? (
                 <div className="flex items-center gap-3 px-3">
                   <img
-                    src={user.photoURL || "https://i.ibb.co.com/sJjJnc3T/image.png"}
+                    src={user?.photoURL || DEFAULT_PROFILE_IMAGE}
                     alt="Profile"
-                    className="w-10 h-10 rounded-full border border-gray-300 object-cover"
+                    className="w-10 h-10 rounded-full border border-gray-300 object-cover cursor-pointer"
                     onClick={() => go("/profile")}
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_PROFILE_IMAGE;
+                    }}
                   />
                   <div className="flex-1" />
                   <button
