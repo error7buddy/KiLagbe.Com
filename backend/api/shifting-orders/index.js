@@ -35,8 +35,39 @@ export default async function handler(req, res) {
 
     // ✅ POST: create shifting order
     if (req.method === "POST") {
-      const order = new ShiftingOrder(req.body);
-      await order.save();
+      const {
+        name,
+        phone,
+        from_location,
+        from_floor,
+        to_location,
+        to_floor,
+        shift_type,
+        date,
+        message,
+      } = req.body || {};
+
+      // ✅ required fields validation
+      if (!name || !phone || !from_location || !to_location || !shift_type || !date) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Missing required fields: name, phone, from_location, to_location, shift_type, date",
+        });
+      }
+
+      // ✅ whitelist fields only
+      const order = await ShiftingOrder.create({
+        name,
+        phone,
+        from_location,
+        from_floor,
+        to_location,
+        to_floor,
+        shift_type,
+        date,
+        message,
+      });
 
       return res.status(201).json({
         success: true,

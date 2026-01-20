@@ -38,14 +38,17 @@ const BookShifting = () => {
     try {
       if (!API) return alert("❌ VITE_API_URL missing");
 
-      // ✅ send only what backend schema supports
+      // ✅ send fields that backend supports (now includes floors + message)
       const payload = {
         name: form.name,
         phone: form.phone,
         from_location: form.from_location,
+        from_floor: form.from_floor,
         to_location: form.to_location,
+        to_floor: form.to_floor,
         shift_type: form.shift_type,
         date: form.date,
+        message: form.message,
       };
 
       const res = await axios.post(`${API}/api/shifting-orders`, payload);
@@ -62,14 +65,16 @@ const BookShifting = () => {
     }
   };
 
-  // ✅ Clear UI if API missing (no behavior change, just clarity)
   if (!API) {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-10 flex items-center justify-center">
         <div className="bg-white border rounded-xl shadow p-6 max-w-md w-full text-center">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">⚠️ Service Unavailable</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
+            ⚠️ Service Unavailable
+          </h2>
           <p className="text-sm text-gray-600">
-            API configuration is missing. Please set <span className="font-medium">VITE_API_URL</span> and redeploy.
+            API configuration is missing. Please set{" "}
+            <span className="font-medium">VITE_API_URL</span> and redeploy.
           </p>
         </div>
       </div>
@@ -83,9 +88,9 @@ const BookShifting = () => {
           Book a Shifting Service
         </h2>
 
-        {/* ✅ Trust note for Google Safe Browsing (no functionality change) */}
         <p className="text-xs text-gray-500 mb-4">
-          Educational project — booking requests are stored for demo/testing. Do not submit sensitive information.
+          Educational project — booking requests are stored for demo/testing. Do
+          not submit sensitive information.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -117,12 +122,28 @@ const BookShifting = () => {
           />
 
           <input
+            name="from_floor"
+            placeholder="From Floor (optional) e.g. 3rd"
+            value={form.from_floor}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
+          />
+
+          <input
             name="to_location"
             placeholder="To Location"
             value={form.to_location}
             onChange={handleChange}
             className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
             required
+          />
+
+          <input
+            name="to_floor"
+            placeholder="To Floor (optional) e.g. 5th"
+            value={form.to_floor}
+            onChange={handleChange}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
           />
 
           <select
@@ -145,6 +166,15 @@ const BookShifting = () => {
             onChange={handleChange}
             className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
             required
+          />
+
+          <textarea
+            name="message"
+            placeholder="Message (optional) — details about items, time, notes..."
+            value={form.message}
+            onChange={handleChange}
+            rows={3}
+            className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-black/20"
           />
 
           <button
