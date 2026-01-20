@@ -2,8 +2,13 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import bkash from "../Payment/bkash.png";
+import nagad from "../Payment/nagad.png";
+import rocket from "../Payment/rocket.png";
 
-// ✅ Example payment method data (demo)
+
+
+
 const paymentMethods = [
   {
     id: 1,
@@ -39,19 +44,19 @@ const paymentMethods = [
     id: 6,
     name: "bKash",
     description: "Demo payment option for this university project.",
-    logo: "/logos/1656227518bkash-logo-png.png",
+    logo: bkash,
   },
   {
     id: 7,
     name: "Nagad",
     description: "Demo payment option for this university project.",
-    logo: "/logos/Nagad_Logo_horizontally_og.png",
+    logo: nagad,
   },
   {
     id: 8,
     name: "Rocket",
     description: "Demo payment option for this university project.",
-    logo: "/logos/dutch-bangla-rocket-logo-png_seeklogo-317692.png",
+    logo: rocket,
   },
 ];
 
