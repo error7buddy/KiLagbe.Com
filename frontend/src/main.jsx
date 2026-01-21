@@ -17,6 +17,7 @@ import { AppProvider } from "./Context/AppContext";
 import { auth } from "./Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import Profile from "./Navbar/Profile";
+import EditAd from "./Pages/EditAd";
 
 // ✅ NEW imports
 import PrivacyPolicy from "./Pages/PrivacyPolicy";
@@ -50,10 +51,11 @@ const router = createBrowserRouter([
       { path: "home", element: <Home /> },
       { path: "about", element: <About /> },
 
-      // ✅ NEW routes (public)
+      // ✅ public pages
       { path: "privacy", element: <PrivacyPolicy /> },
       { path: "terms", element: <Terms /> },
 
+      // ✅ protected pages
       {
         path: "advertise",
         element: (
@@ -62,12 +64,24 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+
       { path: "shifting", element: <Shifting /> },
       { path: "book-shifting/:id", element: <BookShifting /> },
       { path: "auth", element: <AuthForm /> },
       { path: "login", element: <Login /> },
       { path: "admin", element: <AdminPage /> },
+
       { path: "profile", element: <Profile /> },
+
+      // ✅ ADD THIS ROUTE (Edit Ad)
+      {
+        path: "edit-ad/:id",
+        element: (
+          <ProtectedRoute>
+            <EditAd />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
