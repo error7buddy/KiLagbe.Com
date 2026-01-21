@@ -18,7 +18,8 @@ function setCors(res, origin) {
   }
 
   res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+  // ✅ ADD PUT here
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 }
 
@@ -34,19 +35,34 @@ export default async function handler(req, res) {
   try {
     await connectMongo();
 
-    // ✅ POST (JSON)
+    // ✅ GET (all ads, user ads, or single ad by id)
+    if (req.method === "GET") {
+      const { userId, id } = req.query;
+
+      // ✅ Single ad (for edit page)
+      if (id) {
+        const ad = await Advertisement.findById(id);
+        if (!ad) {
+          return res.status(404).json({ success: false, message: "Ad not found" });
+        }
+        return res.status(200).json({ success: true, ad });
+      }
+
+      // ✅ Ads by user
+      if (userId) {
+        const ads = await Advertisement.find({ userId }).sort({ createdAt: -1 });
+        return res.status(200).json(ads);
+      }
+
+      // ✅ All ads
+      const ads = await Advertisement.find().sort({ createdAt: -1 });
+      return res.status(200).json(ads);
+    }
+
+    // ✅ POST (create ad)
     if (req.method === "POST") {
-      const {
-        userId,
-        title,
-        description,
-        bhk,
-        houseNo,
-        area,
-        district,
-        phone,
-        images,
-      } = req.body || {};
+      const { userId, title, description, bhk, houseNo, area, district, phone, images } =
+        req.body || {};
 
       if (!userId || !title || !description) {
         return res.status(400).json({
@@ -71,24 +87,40 @@ export default async function handler(req, res) {
         description,
         bhk,
         address: { houseNo, area, district, phone },
-        images: Array.isArray(images) ? images : [],
+        images: Array.isArray(images) ? images : [], // ✅ Cloudinary URLs
       });
 
       await ad.save();
       return res.status(201).json({ success: true, ad });
     }
 
-    // ✅ GET
-    if (req.method === "GET") {
-      if (req.query.userId) {
-        const ads = await Advertisement.find({ userId: req.query.userId }).sort({
-          createdAt: -1,
-        });
-        return res.status(200).json(ads);
+    // ✅ PUT (edit ad) expects ?id=
+    if (req.method === "PUT") {
+      const { id } = req.query;
+      if (!id) {
+        return res.status(400).json({ success: false, message: "Ad ID required" });
       }
 
-      const ads = await Advertisement.find().sort({ createdAt: -1 });
-      return res.status(200).json(ads);
+      const { title, description, bhk, houseNo, area, district, phone, images } =
+        req.body || {};
+
+      const updated = await Advertisement.findByIdAndUpdate(
+        id,
+        {
+          title,
+          description,
+          bhk,
+          address: { houseNo, area, district, phone },
+          ...(Array.isArray(images) ? { images } : {}), // ✅ keep existing if not sent
+        },
+        { new: true }
+      );
+
+      if (!updated) {
+        return res.status(404).json({ success: false, message: "Ad not found" });
+      }
+
+      return res.status(200).json({ success: true, ad: updated });
     }
 
     // ✅ DELETE (?id=)
