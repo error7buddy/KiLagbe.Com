@@ -19,11 +19,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import Profile from "./Navbar/Profile";
 import EditAd from "./Pages/EditAd";
 
-// ✅ NEW imports
+// ✅ Static public pages
 import PrivacyPolicy from "./Pages/PrivacyPolicy";
 import Terms from "./Pages/Terms";
+import Contact from "./Pages/Contact";
 
-// Protected route for authenticated users
+// 🔒 Protected route
 const ProtectedRoute = ({ children }) => {
   const [user, setUser] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
@@ -36,26 +37,31 @@ const ProtectedRoute = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
 
   return user ? children : <Navigate to="/auth" replace />;
 };
 
-// Router
+// 🌐 Router
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
+
+      // ✅ Main pages
       { path: "home", element: <Home /> },
       { path: "about", element: <About /> },
 
-      // ✅ public pages
+      // ✅ Public pages
       { path: "privacy", element: <PrivacyPolicy /> },
       { path: "terms", element: <Terms /> },
+      { path: "contact", element: <Contact /> },
 
-      // ✅ protected pages
+      // 🔒 Protected pages
       {
         path: "advertise",
         element: (
@@ -67,13 +73,13 @@ const router = createBrowserRouter([
 
       { path: "shifting", element: <Shifting /> },
       { path: "book-shifting/:id", element: <BookShifting /> },
+
       { path: "auth", element: <AuthForm /> },
       { path: "login", element: <Login /> },
       { path: "admin", element: <AdminPage /> },
 
       { path: "profile", element: <Profile /> },
 
-      // ✅ ADD THIS ROUTE (Edit Ad)
       {
         path: "edit-ad/:id",
         element: (

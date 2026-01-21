@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function PaidPromotion() {
   return (
@@ -17,8 +18,16 @@ export default function PaidPromotion() {
           Promotion Slot
         </div>
 
-        <div className="mt-4 text-[11px] text-gray-500 text-center">
-          Contact admin to promote
+        {/* Contact Admin Button */}
+        <Link
+          to="/contact"
+          className="mt-4 w-full text-center bg-black text-white text-sm py-2.5 rounded-lg border border-black hover:bg-white hover:text-black transition"
+        >
+          Contact Admin
+        </Link>
+
+        <div className="mt-3 text-[11px] text-gray-500 text-center">
+          For paid promotions & support
         </div>
       </div>
     </div>
