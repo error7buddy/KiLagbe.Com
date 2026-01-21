@@ -19,16 +19,41 @@ const EditAd = () => {
     area: "",
     district: "",
     phone: "",
-    images: [], // keep existing URLs
+    images: [],
   });
 
-  // ✅ Load ad details
   useEffect(() => {
     const loadAd = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API}/api/ads?id=${id}`);
-        const ad = res.data?.ad;
+
+        // ✅ Try single-ad endpoint first
+        let ad = null;
+
+        try {
+          const res = await axios.get(`${API}/api/ads?id=${id}`);
+          // works if backend returns {success:true, ad:{...}}
+          ad = res.data?.ad || null;
+
+          // if backend mistakenly returns array here
+          if (!ad && Array.isArray(res.data)) {
+            ad = res.data.find((x) => x?._id === id) || null;
+          }
+
+          // if backend returns single object directly
+          if (!ad && res.data && res.data._id === id) {
+            ad = res.data;
+          }
+        } catch {
+          ad = null;
+        }
+
+        // ✅ Fallback: fetch all ads and find by id
+        if (!ad) {
+          const resAll = await axios.get(`${API}/api/ads`);
+          const list = Array.isArray(resAll.data) ? resAll.data : [];
+          ad = list.find((x) => x?._id === id) || null;
+        }
 
         if (!ad) {
           alert("Ad not found");
@@ -46,7 +71,7 @@ const EditAd = () => {
           images: Array.isArray(ad.images) ? ad.images : [],
         });
       } catch (err) {
-        console.error(err);
+        console.error("Load ad error:", err?.response?.data || err.message);
         alert("Failed to load ad");
         navigate("/profile");
       } finally {
@@ -62,7 +87,6 @@ const EditAd = () => {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  // ✅ Save edited ad
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -77,7 +101,7 @@ const EditAd = () => {
         area: formData.area,
         district: formData.district,
         phone: formData.phone,
-        images: formData.images, // keep current images (Cloudinary URLs)
+        images: formData.images, // keep existing Cloudinary URLs
       };
 
       const res = await axios.put(`${API}/api/ads?id=${id}`, payload, {
@@ -91,7 +115,7 @@ const EditAd = () => {
         alert(res.data?.message || "❌ Update failed");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Update ad error:", err?.response?.data || err.message);
       alert(err?.response?.data?.message || "❌ Error updating ad");
     } finally {
       setSaving(false);
@@ -102,10 +126,7 @@ const EditAd = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-xl mx-auto bg-white shadow rounded-xl p-6"
-      >
+      <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white shadow rounded-xl p-6">
         <h2 className="text-2xl font-bold mb-6">Edit Advertisement</h2>
 
         <input
@@ -166,13 +187,8 @@ const EditAd = () => {
           className="w-full p-2 mb-4 border rounded"
         />
 
-        {/* show first image if exists */}
         {formData.images?.[0] && (
-          <img
-            src={formData.images[0]}
-            alt="ad"
-            className="w-full h-48 object-cover rounded mb-4"
-          />
+          <img src={formData.images[0]} alt="ad" className="w-full h-48 object-cover rounded mb-4" />
         )}
 
         <div className="flex gap-3">
